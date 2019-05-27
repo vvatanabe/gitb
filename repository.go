@@ -40,9 +40,10 @@ func NewBacklogRepository(path string) (*BacklogRepository, error) {
 	spaceKey := delimitedHost[0]
 	domain := strings.Join(delimitedHost[len(delimitedHost)-2:], ".")
 
-	delimitedPath := strings.Split(strings.TrimPrefix(ep.Path, "/"), "/")
-	projectKey := delimitedPath[0]
-	repoName := strings.TrimSuffix(delimitedPath[1], ".git")
+	epPath := strings.TrimPrefix(ep.Path, "/git")
+	delimitedPath := strings.Split(epPath, "/")
+	projectKey := delimitedPath[1]
+	repoName := strings.TrimSuffix(delimitedPath[2], ".git")
 
 	head, err := repo.Head()
 	if err != nil {
