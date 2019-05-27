@@ -1,6 +1,7 @@
 package main
 
 import (
+	"os/exec"
 	"sort"
 	"strings"
 
@@ -118,7 +119,7 @@ func (b *BacklogRepository) OpenPullRequestList() error {
 }
 
 func (b *BacklogRepository) OpenPullRequest() error {
-	id, err := b.FindPullRequestIDFromRemote(b.head.Name().Short())
+	id, err := b.FindPullRequestIDFromRemote(b.head.Name().String())
 	if err != nil {
 		return err
 	}
@@ -128,44 +129,49 @@ func (b *BacklogRepository) OpenPullRequest() error {
 		PullRequestURL(id))
 }
 
+const (
+	refPrefix            = "refs/"
+	refPullRequestPrefix = refPrefix + "pull/"
+	refPullRequestSuffix = "/head"
+)
+
 func (b *BacklogRepository) FindPullRequestIDFromRemote(branchName string) (string, error) {
-	r, err := b.repo.Remote("origin")
+
+	cmd := exec.Command("git", "ls-remote", "-q")
+	out, err := cmd.Output()
 	if err != nil {
 		return "", err
 	}
 
-	rfs, err := r.List(&git.ListOptions{})
-	if err != nil {
-		return "", err
+	rfs := make(map[string]string)
+	remotes := strings.Split(strings.TrimSuffix(string(out), "\n"), "\n")
+	for _, v := range remotes {
+		delimited := strings.Split(v, "\t")
+		hash := delimited[0]
+		ref := delimited[1]
+		rfs[ref] = hash
 	}
 
-	var target *plumbing.Reference
-	for _, rf := range rfs {
-		if rf.Name().Short() == branchName {
-			target = rf
-			break
-		}
-	}
-	if target == nil {
+	targetHash, ok := rfs[branchName]
+	if !ok {
 		return "", errors.New("not found a current branch in remote")
 	}
 
 	var prIDs []string
-	for _, rf := range rfs {
-		sn := rf.Name().Short()
-		if !strings.HasPrefix(sn, "pull/") || !strings.HasSuffix(sn, "/head") {
+	for refName, hash := range rfs {
+		if !strings.HasPrefix(refName, refPullRequestPrefix) || !strings.HasSuffix(refName, refPullRequestSuffix) {
 			continue
 		}
-		if rf.Hash() != target.Hash() {
+		if hash != targetHash {
 			continue
 		}
-		prID := strings.TrimPrefix(sn, "pull/")
-		prID = strings.TrimSuffix(prID, "/head")
+		prID := strings.TrimPrefix(refName, refPullRequestPrefix)
+		prID = strings.TrimSuffix(prID, refPullRequestSuffix)
 		prIDs = append(prIDs, prID)
 	}
 
 	if len(prIDs) == 0 {
-		return "", errors.New("not found a pull request")
+		return "", errors.New("not found a pull request related to current branch")
 	}
 
 	sort.Sort(sort.Reverse(sort.StringSlice(prIDs)))
