@@ -13,3 +13,7 @@
 
 # Intellij idea
 .idea
+
+coverage.out
+
+dist

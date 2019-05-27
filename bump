@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+current_version=$(gobump show -r .)
+
+echo "current version: $current_version"
+read -p "input next version: " next_version
+
+echo "--> Bumping version $next_version"
+gobump set $next_version -w .
+echo "--> Generating CHANGELOG"
+ghch -w -N $next_version
+
+git add . CHANGELOG.md
+git commit -m "Bump version $next_version"
+git tag $next_version
+git push && git push --tags
