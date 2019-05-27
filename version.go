@@ -4,7 +4,7 @@ import "fmt"
 
 const (
 	name      = "gitb"
-	version   = "0.9.1"
+	version   = "0.9.2"
 	usage     = "A command line tool for using Backlog's git comfortably."
 	usageText = name + " <command>"
 )
