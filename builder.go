@@ -74,6 +74,10 @@ func (b *BacklogURLBuilder) AddPullRequestURL(base, topic string) string {
 	return b.GitRepoBaseURL() + path.Join("/", "pullRequests", "add", s)
 }
 
+func (b *BacklogURLBuilder) IssueListURL() string {
+	return b.BaseURL() + path.Join("/", "find", b.projectKey)
+}
+
 func (b *BacklogURLBuilder) IssueURL(issueKey string) string {
 	return b.BaseURL() + path.Join("/", "view", issueKey)
 }

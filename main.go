@@ -6,6 +6,10 @@ import (
 	"github.com/urfave/cli"
 )
 
+const help = `
+
+`
+
 func main() {
 	app := cli.NewApp()
 	app.Name = name
@@ -23,25 +27,32 @@ func main() {
 	app.Commands = []cli.Command{
 		{
 			Name:  "pr",
-			Usage: "Open the pull request page related to current branch",
-			Action: func(c *cli.Context) error {
-				return exit(GetBacklogRepositoryFromContext(c).OpenPullRequest())
-			},
-		},
-		{
-			Name:  "ls-pr",
-			Usage: "Open the pull request list page",
+			Usage: "Open the pull request list page in current repository",
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenPullRequestList())
 			},
-		},
-		{
-			Name:      "add-pr",
-			Usage:     "Open the page to create pull request with current branch",
-			ArgsUsage: "[<base>]",
-			Action: func(c *cli.Context) error {
-				base := c.Args().Get(0)
-				return exit(GetBacklogRepositoryFromContext(c).OpenAddPullRequest(base, ""))
+			Subcommands: []cli.Command{
+				{
+					Name:  "show",
+					Usage: "Open the pull request page related to current branch",
+					Action: func(c *cli.Context) error {
+						return exit(GetBacklogRepositoryFromContext(c).OpenPullRequest())
+					},
+				},
+				{
+					Name:  "create",
+					Usage: "Open the page to create pull request with current branch",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name:  "b, base",
+							Usage: "BASE is base branch name. Default is empty",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						base := c.Args().Get(0)
+						return exit(GetBacklogRepositoryFromContext(c).OpenAddPullRequest(base, ""))
+					},
+				},
 			},
 		},
 		{
@@ -50,6 +61,7 @@ func main() {
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenIssue())
 			},
+			Subcommands: []cli.Command{},
 		},
 		{
 			Name:  "add-issue",

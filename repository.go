@@ -52,26 +52,28 @@ func NewBacklogRepository(path string) (*BacklogRepository, error) {
 	}
 
 	return &BacklogRepository{
-		repo:       repo,
-		head:       head,
-		domain:     domain,
-		spaceKey:   spaceKey,
-		projectKey: projectKey,
-		repoName:   repoName,
+		openBrowser: OpenBrowser,
+		repo:        repo,
+		head:        head,
+		domain:      domain,
+		spaceKey:    spaceKey,
+		projectKey:  projectKey,
+		repoName:    repoName,
 	}, nil
 }
 
 type BacklogRepository struct {
-	repo       *git.Repository
-	head       *plumbing.Reference
-	domain     string
-	spaceKey   string
-	projectKey string
-	repoName   string
+	openBrowser func(url string) error
+	repo        *git.Repository
+	head        *plumbing.Reference
+	domain      string
+	spaceKey    string
+	projectKey  string
+	repoName    string
 }
 
 func (b *BacklogRepository) OpenRepositoryList() error {
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		GitBaseURL())
@@ -81,7 +83,7 @@ func (b *BacklogRepository) OpenTree(spec string) error {
 	if spec == "" {
 		spec = b.head.Name().Short()
 	}
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		TreeURL(spec))
@@ -91,28 +93,28 @@ func (b *BacklogRepository) OpenHistory(spec string) error {
 	if spec == "" {
 		spec = b.head.Name().Short()
 	}
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		TreeURL(spec))
 }
 
 func (b *BacklogRepository) OpenBranchList() error {
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		BranchListURL())
 }
 
 func (b *BacklogRepository) OpenTagList() error {
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		TagListURL())
 }
 
 func (b *BacklogRepository) OpenPullRequestList() error {
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		PullRequestListURL(1))
@@ -123,7 +125,7 @@ func (b *BacklogRepository) OpenPullRequest() error {
 	if err != nil {
 		return err
 	}
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		PullRequestURL(id))
@@ -183,7 +185,7 @@ func (b *BacklogRepository) OpenAddPullRequest(base, topic string) error {
 	if topic == "" {
 		topic = b.head.Name().Short()
 	}
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		AddPullRequestURL(base, topic))
@@ -194,7 +196,7 @@ func (b *BacklogRepository) OpenIssue() error {
 	if key == "" {
 		return errors.New("could not find issue key in current branch name")
 	}
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		IssueURL(key))
@@ -209,7 +211,7 @@ func extractIssueKey(s string) string {
 }
 
 func (b *BacklogRepository) OpenAddIssue() error {
-	return OpenBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		AddIssueURL())
