@@ -4,31 +4,195 @@ import (
 	"reflect"
 	"testing"
 
+	"fmt"
+
 	"github.com/pkg/errors"
 	"gopkg.in/src-d/go-git.v4"
 	"gopkg.in/src-d/go-git.v4/plumbing"
+	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 )
 
-func TestNewBacklogRepository(t *testing.T) {
+func TestNewRepository(t *testing.T) {
 	type args struct {
 		path string
 	}
 	tests := []struct {
 		name    string
 		args    args
-		want    *BacklogRepository
+		want    Repository
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := NewBacklogRepository(tt.args.path)
+			got, err := NewRepository(tt.args.path)
 			if (err != nil) != tt.wantErr {
-				t.Errorf("NewBacklogRepository() error = %v, wantErr %v", err, tt.wantErr)
+				t.Errorf("NewRepository() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
 			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewRepository() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_repository_HeadName(t *testing.T) {
+	type fields struct {
+		repo *git.Repository
+		head *plumbing.Reference
+		ep   *transport.Endpoint
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := repository{
+				repo: tt.fields.repo,
+				head: tt.fields.head,
+				ep:   tt.fields.ep,
+			}
+			if got := r.HeadName(); got != tt.want {
+				t.Errorf("repository.HeadName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_repository_HeadShortName(t *testing.T) {
+	type fields struct {
+		repo *git.Repository
+		head *plumbing.Reference
+		ep   *transport.Endpoint
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := repository{
+				repo: tt.fields.repo,
+				head: tt.fields.head,
+				ep:   tt.fields.ep,
+			}
+			if got := r.HeadShortName(); got != tt.want {
+				t.Errorf("repository.HeadShortName() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_repository_RemoteEndpointHost(t *testing.T) {
+	type fields struct {
+		repo *git.Repository
+		head *plumbing.Reference
+		ep   *transport.Endpoint
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := repository{
+				repo: tt.fields.repo,
+				head: tt.fields.head,
+				ep:   tt.fields.ep,
+			}
+			if got := r.RemoteEndpointHost(); got != tt.want {
+				t.Errorf("repository.RemoteEndpointHost() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_repository_RemoteEndpointPath(t *testing.T) {
+	type fields struct {
+		repo *git.Repository
+		head *plumbing.Reference
+		ep   *transport.Endpoint
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := repository{
+				repo: tt.fields.repo,
+				head: tt.fields.head,
+				ep:   tt.fields.ep,
+			}
+			if got := r.RemoteEndpointPath(); got != tt.want {
+				t.Errorf("repository.RemoteEndpointPath() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_repository_LsRemote(t *testing.T) {
+	type fields struct {
+		repo *git.Repository
+		head *plumbing.Reference
+		ep   *transport.Endpoint
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		want    RefToHash
+		wantErr bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			r := repository{
+				repo: tt.fields.repo,
+				head: tt.fields.head,
+				ep:   tt.fields.ep,
+			}
+			got, err := r.LsRemote()
+			if (err != nil) != tt.wantErr {
+				t.Errorf("repository.LsRemote() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("repository.LsRemote() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNewBacklogRepository(t *testing.T) {
+	type args struct {
+		repo Repository
+	}
+	tests := []struct {
+		name string
+		args args
+		want *BacklogRepository
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewBacklogRepository(tt.args.repo); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("NewBacklogRepository() = %v, want %v", got, tt.want)
 			}
 		})
@@ -126,8 +290,7 @@ func Test_extractProjectKeyAndRepoName(t *testing.T) {
 func TestBacklogRepository_OpenRepositoryList(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -141,6 +304,10 @@ func TestBacklogRepository_OpenRepositoryList(t *testing.T) {
 		{
 			fields: fields{
 				openBrowser: func(url string) error {
+					want := "https://foo.backlog.com/git/BAR"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
 					return nil
 				},
 				domain:     "backlog.com",
@@ -150,25 +317,12 @@ func TestBacklogRepository_OpenRepositoryList(t *testing.T) {
 			},
 			wantErr: false,
 		},
-		{
-			fields: fields{
-				openBrowser: func(url string) error {
-					return errors.New("test")
-				},
-				domain:     "backlog.com",
-				spaceKey:   "foo",
-				projectKey: "BAR",
-				repoName:   "baz",
-			},
-			wantErr: true,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -184,8 +338,7 @@ func TestBacklogRepository_OpenRepositoryList(t *testing.T) {
 func TestBacklogRepository_OpenTree(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -202,15 +355,23 @@ func TestBacklogRepository_OpenTree(t *testing.T) {
 	}{
 		{
 			fields: fields{
-				openBrowser: func(url string) error {
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/tree/develop"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
 					return nil
 				},
-				domain:     "backlog.com",
-				spaceKey:   "foo",
-				projectKey: "BAR",
-				repoName:   "baz",
+				&RepositoryMock{
+					HeadShortNameFunc: func() string {
+						return "develop"
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
 			},
-			args:    args{"master"},
 			wantErr: false,
 		},
 	}
@@ -219,7 +380,6 @@ func TestBacklogRepository_OpenTree(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -235,8 +395,7 @@ func TestBacklogRepository_OpenTree(t *testing.T) {
 func TestBacklogRepository_OpenHistory(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -251,14 +410,33 @@ func TestBacklogRepository_OpenHistory(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/history/develop"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadShortNameFunc: func() string {
+						return "develop"
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -274,8 +452,7 @@ func TestBacklogRepository_OpenHistory(t *testing.T) {
 func TestBacklogRepository_OpenNetwork(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -290,14 +467,33 @@ func TestBacklogRepository_OpenNetwork(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/network/develop"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadShortNameFunc: func() string {
+						return "develop"
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -313,8 +509,7 @@ func TestBacklogRepository_OpenNetwork(t *testing.T) {
 func TestBacklogRepository_OpenBranchList(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -325,14 +520,29 @@ func TestBacklogRepository_OpenBranchList(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/branches"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -348,8 +558,7 @@ func TestBacklogRepository_OpenBranchList(t *testing.T) {
 func TestBacklogRepository_OpenTagList(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -360,14 +569,29 @@ func TestBacklogRepository_OpenTagList(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/tags"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -383,8 +607,7 @@ func TestBacklogRepository_OpenTagList(t *testing.T) {
 func TestBacklogRepository_OpenPullRequestList(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -399,14 +622,30 @@ func TestBacklogRepository_OpenPullRequestList(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests?q.statusId=1"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args:    args{"open"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -465,8 +704,7 @@ func TestPRStatusFromString(t *testing.T) {
 func TestBacklogRepository_OpenPullRequest(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -484,7 +722,6 @@ func TestBacklogRepository_OpenPullRequest(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -500,8 +737,7 @@ func TestBacklogRepository_OpenPullRequest(t *testing.T) {
 func TestBacklogRepository_findPullRequestIDFromRemote(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -524,7 +760,6 @@ func TestBacklogRepository_findPullRequestIDFromRemote(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -542,11 +777,50 @@ func TestBacklogRepository_findPullRequestIDFromRemote(t *testing.T) {
 	}
 }
 
+func Test_isPRRef(t *testing.T) {
+	type args struct {
+		ref string
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := isPRRef(tt.args.ref); got != tt.want {
+				t.Errorf("isPRRef() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_extractPRID(t *testing.T) {
+	type args struct {
+		ref string
+	}
+	tests := []struct {
+		name string
+		args args
+		want string
+	}{
+		// TODO: Add test cases.
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := extractPRID(tt.args.ref); got != tt.want {
+				t.Errorf("extractPRID() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
 func TestBacklogRepository_OpenAddPullRequest(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -569,7 +843,6 @@ func TestBacklogRepository_OpenAddPullRequest(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -585,8 +858,7 @@ func TestBacklogRepository_OpenAddPullRequest(t *testing.T) {
 func TestBacklogRepository_OpenIssue(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -604,7 +876,6 @@ func TestBacklogRepository_OpenIssue(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -640,8 +911,7 @@ func Test_extractIssueKey(t *testing.T) {
 func TestBacklogRepository_OpenAddIssue(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -659,7 +929,6 @@ func TestBacklogRepository_OpenAddIssue(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
@@ -718,8 +987,7 @@ func TestIssueStatusFromString(t *testing.T) {
 func TestBacklogRepository_OpenIssueList(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error
-		repo        *git.Repository
-		head        *plumbing.Reference
+		repo        Repository
 		domain      string
 		spaceKey    string
 		projectKey  string
@@ -741,7 +1009,6 @@ func TestBacklogRepository_OpenIssueList(t *testing.T) {
 			b := &BacklogRepository{
 				openBrowser: tt.fields.openBrowser,
 				repo:        tt.fields.repo,
-				head:        tt.fields.head,
 				domain:      tt.fields.domain,
 				spaceKey:    tt.fields.spaceKey,
 				projectKey:  tt.fields.projectKey,
