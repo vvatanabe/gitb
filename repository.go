@@ -1,7 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"os/exec"
+	"runtime"
 	"sort"
 	"strings"
 
@@ -21,7 +23,7 @@ type Repository interface {
 	LsRemote() (RefToHash, error)
 }
 
-func NewRepository(path string) (Repository, error) {
+func OpenRepository(path string) (Repository, error) {
 	repo, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{
 		DetectDotGit: true,
 	})
@@ -80,16 +82,19 @@ func (r repository) LsRemote() (RefToHash, error) {
 	if err != nil {
 		return nil, err
 	}
+	return toRefToHash(out), nil
+}
 
+func toRefToHash(b []byte) RefToHash {
 	refToHash := make(RefToHash)
-	remotes := strings.Split(strings.TrimSuffix(string(out), "\n"), "\n")
+	remotes := strings.Split(strings.TrimSuffix(string(b), "\n"), "\n")
 	for _, v := range remotes {
 		delimited := strings.Split(v, "\t")
 		hash := delimited[0]
 		ref := delimited[1]
 		refToHash[ref] = hash
 	}
-	return refToHash, nil
+	return refToHash
 }
 
 func NewBacklogRepository(repo Repository) *BacklogRepository {
@@ -373,4 +378,19 @@ func (b *BacklogRepository) OpenIssueList(state string) error {
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		IssueListURL(statusIds))
+}
+
+func openBrowser(url string) error {
+	var err error
+	switch runtime.GOOS {
+	case "linux":
+		err = exec.Command("xdg-open", url).Start()
+	case "windows":
+		err = exec.Command("rundll32", "url.dll,FileProtocolHandler", url).Start()
+	case "darwin":
+		err = exec.Command("open", url).Start()
+	default:
+		err = fmt.Errorf("unsupported platform")
+	}
+	return err
 }
