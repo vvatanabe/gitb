@@ -28,8 +28,15 @@ func main() {
 		{
 			Name:  "pr",
 			Usage: "Open the pull request list page in current repository",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "s, state",
+					Value: "open",
+				},
+			},
 			Action: func(c *cli.Context) error {
-				return exit(GetBacklogRepositoryFromContext(c).OpenPullRequestList())
+				s := c.String("state")
+				return exit(GetBacklogRepositoryFromContext(c).OpenPullRequestList(s))
 			},
 			Subcommands: []cli.Command{
 				{
@@ -40,16 +47,15 @@ func main() {
 					},
 				},
 				{
-					Name:  "create",
-					Usage: "Open the page to create pull request with current branch",
+					Name:  "add",
+					Usage: "Open the page to add pull request with current branch",
 					Flags: []cli.Flag{
 						cli.StringFlag{
-							Name:  "b, base",
-							Usage: "BASE is base branch name. Default is empty",
+							Name: "b, base",
 						},
 					},
 					Action: func(c *cli.Context) error {
-						base := c.Args().Get(0)
+						base := c.String("base")
 						return exit(GetBacklogRepositoryFromContext(c).OpenAddPullRequest(base, ""))
 					},
 				},
@@ -57,52 +63,74 @@ func main() {
 		},
 		{
 			Name:  "issue",
-			Usage: "Open the issue page related to current branch",
-			Action: func(c *cli.Context) error {
-				return exit(GetBacklogRepositoryFromContext(c).OpenIssue())
+			Usage: "Open the issue list page in current project",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "s, state",
+					Value: "not_closed",
+				},
 			},
-			Subcommands: []cli.Command{},
+			Action: func(c *cli.Context) error {
+				s := c.String("state")
+				return exit(GetBacklogRepositoryFromContext(c).OpenIssueList(s))
+			},
+			Subcommands: []cli.Command{
+				{
+					Name:  "show",
+					Usage: "Open the issue page related to current branch",
+					Action: func(c *cli.Context) error {
+						return exit(GetBacklogRepositoryFromContext(c).OpenIssue())
+					},
+				},
+				{
+					Name:  "add",
+					Usage: "Open the page to add issue in current repository's project",
+					Action: func(c *cli.Context) error {
+						return GetBacklogRepositoryFromContext(c).OpenAddIssue()
+					},
+				},
+			},
 		},
 		{
-			Name:  "add-issue",
-			Usage: "Open the page to create issue in current repository's project",
-			Action: func(c *cli.Context) error {
-				return GetBacklogRepositoryFromContext(c).OpenAddIssue()
-			},
-		},
-		{
-			Name:  "ls-repo",
-			Usage: "Open the repository list page of current repository's project",
-			Action: func(c *cli.Context) error {
-				return exit(GetBacklogRepositoryFromContext(c).OpenRepositoryList())
-			},
-		},
-		{
-			Name:  "ls-branch",
-			Usage: "Open the branch list page of current repository",
+			Name:  "branch",
+			Usage: "Open the branch list page in current repository",
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenBranchList())
 			},
 		},
 		{
-			Name:  "ls-tag",
-			Usage: "Open the tag list page of current repository",
+			Name:  "tag",
+			Usage: "Open the tag list page in current repository",
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenTagList())
 			},
 		},
 		{
 			Name:  "tree",
-			Usage: "Open the tree page of current branch",
+			Usage: "Open the tree page in current branch",
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenTree(""))
 			},
 		},
 		{
-			Name:  "log",
-			Usage: "Open the commit log page of current branch",
+			Name:  "history",
+			Usage: "Open the history page in current branch",
 			Action: func(c *cli.Context) error {
 				return exit(GetBacklogRepositoryFromContext(c).OpenHistory(""))
+			},
+		},
+		{
+			Name:  "network",
+			Usage: "Open the network page in current branch",
+			Action: func(c *cli.Context) error {
+				return exit(GetBacklogRepositoryFromContext(c).OpenNetwork(""))
+			},
+		},
+		{
+			Name:  "repo",
+			Usage: "Open the repository list page in current project",
+			Action: func(c *cli.Context) error {
+				return exit(GetBacklogRepositoryFromContext(c).OpenRepositoryList())
 			},
 		},
 	}
