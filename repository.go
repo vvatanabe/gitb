@@ -223,7 +223,7 @@ func PRStatusFromString(s string) (status PRStatus, err error) {
 }
 
 func (b *BacklogRepository) OpenPullRequest() error {
-	id, err := b.findPullRequestIDFromRemote(b.repo.HeadShortName())
+	id, err := b.findPullRequestIDFromRemote(b.repo.HeadName())
 	if err != nil {
 		return err
 	}
@@ -241,14 +241,14 @@ const (
 
 type RefToHash map[string]string
 
-func (b *BacklogRepository) findPullRequestIDFromRemote(branchName string) (string, error) {
+func (b *BacklogRepository) findPullRequestIDFromRemote(ref string) (string, error) {
 
 	refToHash, err := b.repo.LsRemote()
 	if err != nil {
 		return "", err
 	}
 
-	targetHash, ok := refToHash[branchName]
+	targetHash, ok := refToHash[ref]
 	if !ok {
 		return "", errors.New("not found a current branch in remote")
 	}

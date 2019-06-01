@@ -664,7 +664,21 @@ func TestPRStatus_Int(t *testing.T) {
 		p    PRStatus
 		want int
 	}{
-		// TODO: Add test cases.
+		{
+			p: PRStatusAll,
+		},
+		{
+			p:    PRStatusOpen,
+			want: 1,
+		},
+		{
+			p:    PRStatusClosed,
+			want: 2,
+		},
+		{
+			p:    PRStatusMerged,
+			want: 3,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -685,7 +699,30 @@ func TestPRStatusFromString(t *testing.T) {
 		wantStatus PRStatus
 		wantErr    bool
 	}{
-		// TODO: Add test cases.
+		{
+			args:       args{"all"},
+			wantStatus: PRStatusAll,
+			wantErr:    false,
+		},
+		{
+			args:       args{"open"},
+			wantStatus: PRStatusOpen,
+			wantErr:    false,
+		},
+		{
+			args:       args{"closed"},
+			wantStatus: PRStatusClosed,
+			wantErr:    false,
+		},
+		{
+			args:       args{"merged"},
+			wantStatus: PRStatusMerged,
+			wantErr:    false,
+		},
+		{
+			args:    args{"test"},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -715,7 +752,96 @@ func TestBacklogRepository_OpenPullRequest(t *testing.T) {
 		fields  fields
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests/3"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadNameFunc: func() string {
+						return "refs/heads/patch-1"
+					},
+					LsRemoteFunc: func() (RefToHash, error) {
+						refToHash := make(RefToHash)
+						refToHash["HEAD"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/master"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/patch-1"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/pull/3/head"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/tags/0.0.0"] = "2674ad54e116b4a05d933aa75c7af0657afd0079"
+						return refToHash, nil
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests/3"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadNameFunc: func() string {
+						return "refs/tags/0.0.0"
+					},
+					LsRemoteFunc: func() (RefToHash, error) {
+						refToHash := make(RefToHash)
+						refToHash["HEAD"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/master"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/patch-1"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/pull/3/head"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/tags/0.0.0"] = "2674ad54e116b4a05d933aa75c7af0657afd0079"
+						return refToHash, nil
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: true,
+		},
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests/3"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadNameFunc: func() string {
+						return "refs/heads/patch-2"
+					},
+					LsRemoteFunc: func() (RefToHash, error) {
+						refToHash := make(RefToHash)
+						refToHash["HEAD"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/master"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/patch-1"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/pull/3/head"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/tags/0.0.0"] = "2674ad54e116b4a05d933aa75c7af0657afd0079"
+						return refToHash, nil
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -744,7 +870,7 @@ func TestBacklogRepository_findPullRequestIDFromRemote(t *testing.T) {
 		repoName    string
 	}
 	type args struct {
-		branchName string
+		ref string
 	}
 	tests := []struct {
 		name    string
@@ -765,7 +891,7 @@ func TestBacklogRepository_findPullRequestIDFromRemote(t *testing.T) {
 				projectKey:  tt.fields.projectKey,
 				repoName:    tt.fields.repoName,
 			}
-			got, err := b.findPullRequestIDFromRemote(tt.args.branchName)
+			got, err := b.findPullRequestIDFromRemote(tt.args.ref)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("BacklogRepository.findPullRequestIDFromRemote() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -786,7 +912,14 @@ func Test_isPRRef(t *testing.T) {
 		args args
 		want bool
 	}{
-		// TODO: Add test cases.
+		{
+			args: args{"refs/pull/3/head"},
+			want: true,
+		},
+		{
+			args: args{"refs/heads/master"},
+			want: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -806,7 +939,10 @@ func Test_extractPRID(t *testing.T) {
 		args args
 		want string
 	}{
-		// TODO: Add test cases.
+		{
+			args: args{"refs/pull/3/head"},
+			want: "3",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -836,7 +972,67 @@ func TestBacklogRepository_OpenAddPullRequest(t *testing.T) {
 		args    args
 		wantErr bool
 	}{
-		// TODO: Add test cases.
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests/add/master...patch-2"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					HeadShortNameFunc: func() string {
+						return "patch-2"
+					},
+					LsRemoteFunc: func() (RefToHash, error) {
+						refToHash := make(RefToHash)
+						refToHash["HEAD"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/master"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/patch-1"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/heads/patch-2"] = "117591be8e3911e4e34d28d9e4bad26d6aa00460"
+						refToHash["refs/pull/3/head"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/tags/0.0.0"] = "2674ad54e116b4a05d933aa75c7af0657afd0079"
+						return refToHash, nil
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args:    args{"master", ""},
+			wantErr: false,
+		},
+		{
+			fields: fields{
+				func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/pullRequests/add/master...patch-1"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				&RepositoryMock{
+					LsRemoteFunc: func() (RefToHash, error) {
+						refToHash := make(RefToHash)
+						refToHash["HEAD"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/master"] = "e73e35d0a86218a9624167110ff8e7fe42596234"
+						refToHash["refs/heads/patch-1"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/heads/patch-2"] = "117591be8e3911e4e34d28d9e4bad26d6aa00460"
+						refToHash["refs/pull/3/head"] = "2b2b5f9e8508a976096a50bd37c81c17ccdf7fb4"
+						refToHash["refs/tags/0.0.0"] = "2674ad54e116b4a05d933aa75c7af0657afd0079"
+						return refToHash, nil
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args:    args{"master", "patch-1"},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
