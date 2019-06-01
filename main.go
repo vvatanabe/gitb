@@ -17,11 +17,11 @@ func main() {
 	app.UsageText = usageText
 	app.Version = FmtVersion()
 	app.Before = func(c *cli.Context) error {
-		b, err := NewBacklogRepository(".")
+		repo, err := NewRepository(".")
 		if err != nil {
 			return err
 		}
-		SetBacklogRepositoryToContext(c, b)
+		SetBacklogRepositoryToContext(c, NewBacklogRepository(repo))
 		return nil
 	}
 	app.Commands = []cli.Command{

@@ -13,47 +13,96 @@ import (
 	"gopkg.in/src-d/go-git.v4/plumbing/transport"
 )
 
-func NewBacklogRepository(path string) (*BacklogRepository, error) {
+type Repository interface {
+	HeadName() string
+	HeadShortName() string
+	RemoteEndpointHost() string
+	RemoteEndpointPath() string
+	LsRemote() (RefToHash, error)
+}
+
+func NewRepository(path string) (Repository, error) {
 	repo, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{
 		DetectDotGit: true,
 	})
 	if err != nil {
 		return nil, err
 	}
-
+	head, err := repo.Head()
+	if err != nil {
+		return nil, err
+	}
 	remote, err := repo.Remote("origin")
 	if err != nil {
 		return nil, err
 	}
-
 	cfg := remote.Config()
 	if len(cfg.URLs) == 0 {
 		return nil, errors.New("could not find remote URL")
 	}
-
 	u := cfg.URLs[0]
 	ep, err := transport.NewEndpoint(u)
 	if err != nil {
 		return nil, err
 	}
+	return &repository{
+		repo: repo,
+		head: head,
+		ep:   ep,
+	}, nil
+}
 
-	spaceKey, domain := extractSpaceKeyAndDomain(ep.Host)
-	projectKey, repoName := extractProjectKeyAndRepoName(ep.Path)
+type repository struct {
+	repo *git.Repository
+	head *plumbing.Reference
+	ep   *transport.Endpoint
+}
 
-	head, err := repo.Head()
+func (r repository) HeadName() string {
+	return r.head.Name().String()
+}
+
+func (r repository) HeadShortName() string {
+	return r.head.Name().Short()
+}
+
+func (r repository) RemoteEndpointHost() string {
+	return r.ep.Host
+}
+
+func (r repository) RemoteEndpointPath() string {
+	return r.ep.Path
+}
+
+func (r repository) LsRemote() (RefToHash, error) {
+	cmd := exec.Command("git", "ls-remote", "-q")
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
+	refToHash := make(RefToHash)
+	remotes := strings.Split(strings.TrimSuffix(string(out), "\n"), "\n")
+	for _, v := range remotes {
+		delimited := strings.Split(v, "\t")
+		hash := delimited[0]
+		ref := delimited[1]
+		refToHash[ref] = hash
+	}
+	return refToHash, nil
+}
+
+func NewBacklogRepository(repo Repository) *BacklogRepository {
+	spaceKey, domain := extractSpaceKeyAndDomain(repo.RemoteEndpointHost())
+	projectKey, repoName := extractProjectKeyAndRepoName(repo.RemoteEndpointPath())
 	return &BacklogRepository{
 		openBrowser: openBrowser,
 		repo:        repo,
-		head:        head,
 		domain:      domain,
 		spaceKey:    spaceKey,
 		projectKey:  projectKey,
 		repoName:    repoName,
-	}, nil
+	}
 }
 
 func extractSpaceKeyAndDomain(host string) (spaceKey, domain string) {
@@ -73,8 +122,7 @@ func extractProjectKeyAndRepoName(path string) (projectKey, repoName string) {
 
 type BacklogRepository struct {
 	openBrowser func(url string) error
-	repo        *git.Repository
-	head        *plumbing.Reference
+	repo        Repository
 	domain      string
 	spaceKey    string
 	projectKey  string
@@ -90,7 +138,7 @@ func (b *BacklogRepository) OpenRepositoryList() error {
 
 func (b *BacklogRepository) OpenTree(refOrHash string) error {
 	if refOrHash == "" {
-		refOrHash = b.head.Name().Short()
+		refOrHash = b.repo.HeadShortName()
 	}
 	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
@@ -100,7 +148,7 @@ func (b *BacklogRepository) OpenTree(refOrHash string) error {
 
 func (b *BacklogRepository) OpenHistory(refOrHash string) error {
 	if refOrHash == "" {
-		refOrHash = b.head.Name().Short()
+		refOrHash = b.repo.HeadShortName()
 	}
 	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
@@ -110,7 +158,7 @@ func (b *BacklogRepository) OpenHistory(refOrHash string) error {
 
 func (b *BacklogRepository) OpenNetwork(refOrHash string) error {
 	if refOrHash == "" {
-		refOrHash = b.head.Name().Short()
+		refOrHash = b.repo.HeadShortName()
 	}
 	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
@@ -175,7 +223,7 @@ func PRStatusFromString(s string) (status PRStatus, err error) {
 }
 
 func (b *BacklogRepository) OpenPullRequest() error {
-	id, err := b.findPullRequestIDFromRemote(b.head.Name().String())
+	id, err := b.findPullRequestIDFromRemote(b.repo.HeadShortName())
 	if err != nil {
 		return err
 	}
@@ -191,39 +239,29 @@ const (
 	refPullRequestSuffix = "/head"
 )
 
+type RefToHash map[string]string
+
 func (b *BacklogRepository) findPullRequestIDFromRemote(branchName string) (string, error) {
 
-	cmd := exec.Command("git", "ls-remote", "-q")
-	out, err := cmd.Output()
+	refToHash, err := b.repo.LsRemote()
 	if err != nil {
 		return "", err
 	}
 
-	rfs := make(map[string]string)
-	remotes := strings.Split(strings.TrimSuffix(string(out), "\n"), "\n")
-	for _, v := range remotes {
-		delimited := strings.Split(v, "\t")
-		hash := delimited[0]
-		ref := delimited[1]
-		rfs[ref] = hash
-	}
-
-	targetHash, ok := rfs[branchName]
+	targetHash, ok := refToHash[branchName]
 	if !ok {
 		return "", errors.New("not found a current branch in remote")
 	}
 
 	var prIDs []string
-	for refName, hash := range rfs {
-		if !strings.HasPrefix(refName, refPullRequestPrefix) || !strings.HasSuffix(refName, refPullRequestSuffix) {
+	for ref, hash := range refToHash {
+		if !isPRRef(ref) {
 			continue
 		}
 		if hash != targetHash {
 			continue
 		}
-		prID := strings.TrimPrefix(refName, refPullRequestPrefix)
-		prID = strings.TrimSuffix(prID, refPullRequestSuffix)
-		prIDs = append(prIDs, prID)
+		prIDs = append(prIDs, extractPRID(ref))
 	}
 
 	if len(prIDs) == 0 {
@@ -235,9 +273,18 @@ func (b *BacklogRepository) findPullRequestIDFromRemote(branchName string) (stri
 	return prIDs[0], nil
 }
 
+func isPRRef(ref string) bool {
+	return strings.HasPrefix(ref, refPullRequestPrefix) && strings.HasSuffix(ref, refPullRequestSuffix)
+}
+
+func extractPRID(ref string) string {
+	prID := strings.TrimPrefix(ref, refPullRequestPrefix)
+	return strings.TrimSuffix(prID, refPullRequestSuffix)
+}
+
 func (b *BacklogRepository) OpenAddPullRequest(base, topic string) error {
 	if topic == "" {
-		topic = b.head.Name().Short()
+		topic = b.repo.HeadShortName()
 	}
 	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
 		SetProjectKey(b.projectKey).
@@ -246,7 +293,7 @@ func (b *BacklogRepository) OpenAddPullRequest(base, topic string) error {
 }
 
 func (b *BacklogRepository) OpenIssue() error {
-	key := extractIssueKey(b.head.Name().Short())
+	key := extractIssueKey(b.repo.HeadShortName())
 	if key == "" {
 		return errors.New("could not find issue key in current branch name")
 	}
