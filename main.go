@@ -6,10 +6,6 @@ import (
 	"github.com/urfave/cli"
 )
 
-const help = `
-
-`
-
 func main() {
 	app := cli.NewApp()
 	app.Name = name
