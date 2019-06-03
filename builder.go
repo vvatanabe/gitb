@@ -45,12 +45,16 @@ func (b *BacklogURLBuilder) GitRepoBaseURL() string {
 	return b.GitBaseURL() + path.Join("/", b.repoName)
 }
 
-func (b *BacklogURLBuilder) TreeURL(rev string) string {
-	return b.GitRepoBaseURL() + path.Join("/", "tree", rev)
+func (b *BacklogURLBuilder) TreeURL(refOrHash string) string {
+	return b.GitRepoBaseURL() + path.Join("/", "tree", refOrHash)
 }
 
-func (b *BacklogURLBuilder) HistoryURL(rev string) string {
-	return b.GitRepoBaseURL() + path.Join("/", "history", rev)
+func (b *BacklogURLBuilder) HistoryURL(refOrHash string) string {
+	return b.GitRepoBaseURL() + path.Join("/", "history", refOrHash)
+}
+
+func (b *BacklogURLBuilder) NetworkURL(refOrHash string) string {
+	return b.GitRepoBaseURL() + path.Join("/", "network", refOrHash)
 }
 
 func (b *BacklogURLBuilder) BranchListURL() string {
@@ -62,7 +66,11 @@ func (b *BacklogURLBuilder) TagListURL() string {
 }
 
 func (b *BacklogURLBuilder) PullRequestListURL(statusID int) string {
-	return b.GitRepoBaseURL() + path.Join("/", fmt.Sprintf("pullRequests?q.statusId=%d", statusID))
+	var q string
+	if statusID > 0 {
+		q += fmt.Sprintf("?q.statusId=%d", statusID)
+	}
+	return b.GitRepoBaseURL() + path.Join("/", "pullRequests") + q
 }
 
 func (b *BacklogURLBuilder) PullRequestURL(id string) string {
@@ -72,6 +80,14 @@ func (b *BacklogURLBuilder) PullRequestURL(id string) string {
 func (b *BacklogURLBuilder) AddPullRequestURL(base, topic string) string {
 	s := fmt.Sprintf("%s...%s", base, topic)
 	return b.GitRepoBaseURL() + path.Join("/", "pullRequests", "add", s)
+}
+
+func (b *BacklogURLBuilder) IssueListURL(statusIDs []int) string {
+	q := "?condition.simpleSearch=true"
+	for _, v := range statusIDs {
+		q += fmt.Sprintf("&condition.statusId=%d", v)
+	}
+	return b.BaseURL() + path.Join("/", "find", b.projectKey) + q
 }
 
 func (b *BacklogURLBuilder) IssueURL(issueKey string) string {

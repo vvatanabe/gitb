@@ -152,6 +152,7 @@ func TestBacklogURLBuilder_BaseURL(t *testing.T) {
 		repoName   string
 	}
 	tests := []struct {
+		name   string
 		fields fields
 		want   string
 	}{
@@ -164,15 +165,17 @@ func TestBacklogURLBuilder_BaseURL(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		b := &BacklogURLBuilder{
-			domain:     tt.fields.domain,
-			spaceKey:   tt.fields.spaceKey,
-			projectKey: tt.fields.projectKey,
-			repoName:   tt.fields.repoName,
-		}
-		if got := b.BaseURL(); got != tt.want {
-			t.Errorf("BacklogURLBuilder.BaseURL() = %v, want %v", got, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogURLBuilder{
+				domain:     tt.fields.domain,
+				spaceKey:   tt.fields.spaceKey,
+				projectKey: tt.fields.projectKey,
+				repoName:   tt.fields.repoName,
+			}
+			if got := b.BaseURL(); got != tt.want {
+				t.Errorf("BacklogURLBuilder.BaseURL() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -184,6 +187,7 @@ func TestBacklogURLBuilder_GitBaseURL(t *testing.T) {
 		repoName   string
 	}
 	tests := []struct {
+		name   string
 		fields fields
 		want   string
 	}{
@@ -198,15 +202,17 @@ func TestBacklogURLBuilder_GitBaseURL(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		b := &BacklogURLBuilder{
-			domain:     tt.fields.domain,
-			spaceKey:   tt.fields.spaceKey,
-			projectKey: tt.fields.projectKey,
-			repoName:   tt.fields.repoName,
-		}
-		if got := b.GitBaseURL(); got != tt.want {
-			t.Errorf("BacklogURLBuilder.GitBaseURL() = %v, want %v", got, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogURLBuilder{
+				domain:     tt.fields.domain,
+				spaceKey:   tt.fields.spaceKey,
+				projectKey: tt.fields.projectKey,
+				repoName:   tt.fields.repoName,
+			}
+			if got := b.GitBaseURL(); got != tt.want {
+				t.Errorf("BacklogURLBuilder.GitBaseURL() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -218,6 +224,7 @@ func TestBacklogURLBuilder_GitRepoBaseURL(t *testing.T) {
 		repoName   string
 	}
 	tests := []struct {
+		name   string
 		fields fields
 		want   string
 	}{
@@ -232,15 +239,17 @@ func TestBacklogURLBuilder_GitRepoBaseURL(t *testing.T) {
 		},
 	}
 	for _, tt := range tests {
-		b := &BacklogURLBuilder{
-			domain:     tt.fields.domain,
-			spaceKey:   tt.fields.spaceKey,
-			projectKey: tt.fields.projectKey,
-			repoName:   tt.fields.repoName,
-		}
-		if got := b.GitRepoBaseURL(); got != tt.want {
-			t.Errorf("BacklogURLBuilder.GitRepoBaseURL() = %v, want %v", got, tt.want)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogURLBuilder{
+				domain:     tt.fields.domain,
+				spaceKey:   tt.fields.spaceKey,
+				projectKey: tt.fields.projectKey,
+				repoName:   tt.fields.repoName,
+			}
+			if got := b.GitRepoBaseURL(); got != tt.want {
+				t.Errorf("BacklogURLBuilder.GitRepoBaseURL() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
 
@@ -617,6 +626,86 @@ func TestBacklogURLBuilder_AddIssueURL(t *testing.T) {
 			}
 			if got := b.AddIssueURL(); got != tt.want {
 				t.Errorf("BacklogURLBuilder.AddIssueURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestBacklogURLBuilder_IssueListURL(t *testing.T) {
+	type fields struct {
+		domain     string
+		spaceKey   string
+		projectKey string
+		repoName   string
+	}
+	type args struct {
+		statusIDs []int
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		args   args
+		want   string
+	}{
+		{
+			fields: fields{
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args: args{
+				[]int{},
+			},
+			want: "https://foo.backlog.com/find/BAR?condition.simpleSearch=true",
+		},
+		{
+			fields: fields{
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args: args{
+				[]int{1},
+			},
+			want: "https://foo.backlog.com/find/BAR?condition.simpleSearch=true&condition.statusId=1",
+		},
+		{
+			fields: fields{
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args: args{
+				[]int{2},
+			},
+			want: "https://foo.backlog.com/find/BAR?condition.simpleSearch=true&condition.statusId=2",
+		},
+		{
+			fields: fields{
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			args: args{
+				[]int{1, 2, 3},
+			},
+			want: "https://foo.backlog.com/find/BAR?condition.simpleSearch=true&condition.statusId=1&condition.statusId=2&condition.statusId=3",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogURLBuilder{
+				domain:     tt.fields.domain,
+				spaceKey:   tt.fields.spaceKey,
+				projectKey: tt.fields.projectKey,
+				repoName:   tt.fields.repoName,
+			}
+			if got := b.IssueListURL(tt.args.statusIDs); got != tt.want {
+				t.Errorf("BacklogURLBuilder.IssueListURL() = %v, want %v", got, tt.want)
 			}
 		})
 	}
