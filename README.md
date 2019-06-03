@@ -24,82 +24,91 @@ This package can be installed with the go get command too:
 
 ### Pull Request
 
-Related to Backlog Pull Requests for the current repository
+Related to Backlog Pull Requests for the current repository.
 
 __COMMANDS:__
 
-```
-gitb pr [-s <STATE>]     Open the pull request list page in the current repository
-gitb pr show             Open the pull request page related to the current branch
-gitb pr add [-b <BASE>]  Open the page to create pull request with the current branch
-```
+`gitb pr [-s <STATE>]`
+
+&emsp;Open the pull request list page in the current repository.
+
+`gitb pr show`
+
+&emsp;Open the pull request page related to the current branch.
+
+`gitb pr add [-b <BASE>]`
+
+&emsp;Open the page to create pull request with the current branch.
+
 
 __OPTIONS:__
 
-```
--s, --state <STATE>
+`-s, --state <STATE>`
 
-     Filter pull requests by STATE. Values: "open" (default), "closed", "merged", "all".
+&emsp;Filter pull requests by STATE. Values: "open" (default), "closed", "merged", "all".
 
--b, --base <BASE>
+`-b, --base <BASE>`
 
-    BASE is base branch name. Default is empty.
-```
+&emsp;BASE is base branch name. Default is empty.
 
 ### Issue
 
-Related to Backlog Issues for the current repository
+Related to Backlog Issues for the current repository.
 
 __COMMANDS:__
 
-```
-gitb issue [-s <STATE>]  Open the issue list page in the current project
-gitb issue show          Open the issue page related to the current branch
-gitb issue add           Open the page to create issue in the current project
-```
+`gitb issue [-s <STATE>]`
+
+&emsp;Open the issue list page in the current project.
+
+`gitb issue show`
+
+&emsp;Open the issue page related to the current branch.
+
+`gitb issue add`
+
+&emsp;Open the page to create issue in the current project.
 
 __OPTIONS:__
 
-```
--s, --state <STATE>
+`-s, --state <STATE>`
 
-     Filter issues by STATE. Values: "all", "open", "in_progress", "resolved", "closed", "not_closed" (default)
-```
+&emsp;Filter issues by STATE. Values: "all", "open", "in_progress", "resolved", "closed", "not_closed" (default).
 
 ### Other Commands
 
 `gitb branch`
 
-Open the branch list page in current repository
+&emsp;Open the branch list page in the current repository.
 
 `gitb tag`
 
-Open the tag list page in current repository
+&emsp;Open the tag list page in the current repository.
 
 `gitb tree`
 
-Open the tree page in current branch
+&emsp;Open the tree page in the current branch.
 
 `gitb history`
 
-Open the history page in current branch
-
+&emsp;Open the history page in the current branch
+.
 `gitb network`
 
-Open the network page in current branch
+&emsp;Open the network page in the current branch.
 
 `gitb repo`
 
-Open the repository list page in current project
+&emsp;Open the repository list page in the current project.
 
 `gitb help, h`
 
-Shows a list of commands or help for one command
+&emsp;Shows a list of commands or help for one command.
 
 
 ## Bugs and Feedback
 
-For bugs, questions and discussions please use the Github Issues.
+For bugs, questions and discussions please use the GitHub Issues.
 
 ## License
 
