@@ -14,7 +14,7 @@ endif
 devel-deps:
 	export GO111MODULE=off && \
 	go get ${u} github.com/mattn/goveralls && \
-	go get ${u} github.com/golang/lint/golint && \
+	go get ${u} golang.org/x/lint/golint && \
 	go get ${u} github.com/motemen/gobump/cmd/gobump && \
 	go get ${u} github.com/Songmu/ghch/cmd/ghch && \
 	go get ${u} github.com/Songmu/goxz/cmd/goxz && \
