@@ -20,23 +20,88 @@ https://github.com/vvatanabe/gitb/releases
 
 ## 使い方
 
-```
-使い方:
-   gitb <command>
+### プルリクエスト
 
-コマンド:
-     pr         現在のブランチに関連するプルリクエストページを開く
-     ls-pr      プルリクエスト一覧ページを開く
-     add-pr     現在のブランチでプルリクエストを作成するページを開きます
-     issue      現在のブランチに関連したissueページを開く
-     add-issue  現在のプロジェクトにissueを作成するためのページを開く
-     ls-branch  現在のリポジトリのブランチ一覧ページを開く
-     ls-tag     現在のリポジトリのタグリストページを開く
-     tree       現在のブランチのツリーページを開く
-     log        現在のブランチのコミットログページを開く
-     ls-repo    現在のプロジェクトのリポジトリ一覧ページを開く
-     help, h    コマンドのヘルプを表示する
-```
+現在のリポジトリに対するBacklogのプルリクエストに関連するコマンドです。
+
+__COMMANDS:__
+
+`gitb pr [-s <STATE>]`
+
+&emsp;現在のリポジトリのプルリクエスト一覧ページを開きます。
+
+`gitb pr show`
+
+&emsp;現在のブランチに関連したプルリクエストのページを開きます。
+
+`gitb pr add [-b <BASE>]`
+
+&emsp;現在のブランチでプルリクエストを追加するページを開きます。
+
+
+__OPTIONS:__
+
+`-s, --state <STATE>`
+
+&emsp;STATEでプルリクエストをフィルタリングします。値: "open" (初期値), "closed", "merged", "all".
+
+`-b, --base <BASE>`
+
+&emsp;BASEはプルリクエストのベースとなるブランチ名です。デフォルトは空です。
+
+### 課題
+
+現在のリポジトリに対するBacklogの課題に関連するコマンドです。
+
+__COMMANDS:__
+
+`gitb issue [-s <STATE>]`
+
+&emsp;現在のプロジェクトの課題一覧ページを開きます。
+
+`gitb issue show`
+
+&emsp;現在のブランチに関連する課題ページを開きます。
+
+`gitb issue add`
+
+&emsp;現在のプロジェクトに課題を追加するページを開きます。
+
+__OPTIONS:__
+
+`-s, --state <STATE>`
+
+&emsp;STATEで課題をフィルタリングします。 値: "all", "open", "in_progress", "resolved", "closed", "not_closed" (初期値).
+
+### その他のコマンド
+
+`gitb branch`
+
+&emsp;現在のリポジトリのブランチ一覧ページを開きます。
+
+`gitb tag`
+
+&emsp;現在のリポジトリのタグ一覧ページを開きます。
+
+`gitb tree`
+
+&emsp;現在のブランチのツリーページを開きます。
+
+`gitb history`
+
+&emsp;現在のブランチの履歴ページを開きます。
+
+`gitb network`
+
+&emsp;現在のブランチのネットワークページを開きます。
+
+`gitb repo`
+
+&emsp;現在のプロジェクトのリポジトリ一覧ページを開きます。
+
+`gitb [<COMMAND>] help, h`
+
+&emsp;コマンドの一覧、または1つのコマンドのヘルプを表示します。
 
 ## バグとフィードバック
 

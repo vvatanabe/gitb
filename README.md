@@ -18,8 +18,6 @@ This package can be installed with the go get command too:
 
 `$ go get github.com/vvatanabe/gitb`
 
-
-
 ## Usage
 
 ### Pull Request
@@ -91,8 +89,8 @@ __OPTIONS:__
 
 `gitb history`
 
-&emsp;Open the history page in the current branch
-.
+&emsp;Open the history page in the current branch.
+
 `gitb network`
 
 &emsp;Open the network page in the current branch.
@@ -104,7 +102,6 @@ __OPTIONS:__
 `gitb help, h`
 
 &emsp;Shows a list of commands or help for one command.
-
 
 ## Bugs and Feedback
 
