@@ -46,6 +46,11 @@ build:
 	export GO111MODULE=on && \
 	go build -ldflags="$(BUILD_LDFLAGS)" -o ./dist/current/$(NAME) .
 
+.PHONY: install
+install:
+	export GO111MODULE=on && \
+	go install -ldflags="$(BUILD_LDFLAGS)" .
+
 .PHONY: crossbuild
 crossbuild: devel-deps
 	export GO111MODULE=on && \

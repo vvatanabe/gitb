@@ -1,16 +1,38 @@
 package main
 
 import (
+	"log"
 	"os"
+	"os/exec"
+	"strings"
 
 	"github.com/urfave/cli"
 )
+
+func help() string {
+	var sb strings.Builder
+	out, err := exec.Command("git", "help").Output()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	sb.Write(out)
+	sb.WriteString(`
+These Backlog's git commands are provided by gitb:
+     pr       Open the pull request list page in current repository
+     issue    Open the issue list page in current project
+     browse   Open other git page (e.g. branch, tree, tag, and more...) in current repository
+     help, h  Shows a list of commands or help for one command
+
+`)
+	return sb.String()
+}
 
 func main() {
 	app := cli.NewApp()
 	app.Name = name
 	app.Usage = usage
 	app.UsageText = usageText
+	app.CustomAppHelpTemplate = help()
 	app.Version = FmtVersion()
 	app.Before = func(c *cli.Context) error {
 		repo, err := OpenRepository(".")
@@ -88,47 +110,51 @@ func main() {
 			},
 		},
 		{
-			Name:  "branch",
-			Usage: "Open the branch list page in current repository",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenBranchList())
+			Name:  "browse",
+			Usage: "Open other git page (e.g. branch, tree, tag, and more...) in current repository",
+			Subcommands: []cli.Command{
+				{
+					Name:  "branch",
+					Usage: "Open the branch list page in current repository",
+					Action: func(c *cli.Context) error {
+						return exit(getBacklogRepositoryFromContext(c).OpenBranchList())
+					},
+				},
+				{
+					Name:  "tree",
+					Usage: "Open the tree page in current branch",
+					Action: func(c *cli.Context) error {
+						return exit(getBacklogRepositoryFromContext(c).OpenTree(""))
+					},
+				},
+				{
+					Name:  "history",
+					Usage: "Open the history page in current branch",
+					Action: func(c *cli.Context) error {
+						return exit(getBacklogRepositoryFromContext(c).OpenHistory(""))
+					},
+				},
+				{
+					Name:  "network",
+					Usage: "Open the network page in current branch",
+					Action: func(c *cli.Context) error {
+						return exit(getBacklogRepositoryFromContext(c).OpenNetwork(""))
+					},
+				},
+				{
+					Name:  "repo",
+					Usage: "Open the repository list page in current project",
+					Action: func(c *cli.Context) error {
+						return exit(getBacklogRepositoryFromContext(c).OpenRepositoryList())
+					},
+				},
 			},
 		},
-		{
-			Name:  "tag",
-			Usage: "Open the tag list page in current repository",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenTagList())
-			},
-		},
-		{
-			Name:  "tree",
-			Usage: "Open the tree page in current branch",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenTree(""))
-			},
-		},
-		{
-			Name:  "history",
-			Usage: "Open the history page in current branch",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenHistory(""))
-			},
-		},
-		{
-			Name:  "network",
-			Usage: "Open the network page in current branch",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenNetwork(""))
-			},
-		},
-		{
-			Name:  "repo",
-			Usage: "Open the repository list page in current project",
-			Action: func(c *cli.Context) error {
-				return exit(getBacklogRepositoryFromContext(c).OpenRepositoryList())
-			},
-		},
+	}
+	app.CommandNotFound = func(c *cli.Context, name string) {
+		if err := getBacklogRepositoryFromContext(c).Run(name, os.Args[2:]); err != nil {
+			log.Fatalln(err)
+		}
 	}
 	app.Run(os.Args)
 }
