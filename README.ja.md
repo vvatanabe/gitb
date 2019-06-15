@@ -6,8 +6,9 @@ Backlogのgitを快適に使うためのコマンドラインツール。
 
 `gitb`コマンドはBacklogのgitを快適に使うのに役立ちます。たとえば、PR、issue、branch、tagsなどをブラウザで1回のアクションで開くことができます。
 
-接尾辞Bには複数の意味があります。Backlog、Browser、Bダッシュ（
-素早くスーパーマリオを移動するような）。
+`gitb`コマンドはすべての`git`コマンドをラップしているので、 `gitb fetch`、`gitb pull`、 `gitb push`のように` gitb`コマンドを使って`git-command`を実行することができます。
+
+接尾辞Bには複数の意味があります。Backlog、Browser、Bダッシュ。
 
 ## インストール
 
@@ -73,35 +74,39 @@ __OPTIONS:__
 
 &emsp;STATEで課題をフィルタリングします。 値: "all", "open", "in_progress", "resolved", "closed", "not_closed" (初期値).
 
-### その他のコマンド
+### Browse
 
-`gitb branch`
+現在のリポジトリに関するGitページ（ブランチ、ツリー、タグ等）を開きます。
+
+__COMMANDS:__
+
+`gitb browse branch`
 
 &emsp;現在のリポジトリのブランチ一覧ページを開きます。
 
-`gitb tag`
+`gitb browse tag`
 
 &emsp;現在のリポジトリのタグ一覧ページを開きます。
 
-`gitb tree`
+`gitb browse tree`
 
 &emsp;現在のブランチのツリーページを開きます。
 
-`gitb history`
+`gitb browse history`
 
 &emsp;現在のブランチの履歴ページを開きます。
 
-`gitb network`
+`gitb browse network`
 
 &emsp;現在のブランチのネットワークページを開きます。
 
-`gitb repo`
+`gitb browse repo`
 
 &emsp;現在のプロジェクトのリポジトリ一覧ページを開きます。
 
-`gitb [<COMMAND>] help, h`
+## 謝辞
 
-&emsp;コマンドの一覧、または1つのコマンドのヘルプを表示します。
+Inspired by [github.com/github/hub](https://github.com/github/hub)
 
 ## バグとフィードバック
 
