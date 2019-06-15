@@ -4,10 +4,11 @@ A command line tool for using Backlog's git comfortably.
 
 ## Description
 
-`gitb` command helps to use Backlog's git comfortably. For example, can open PR, issue, branches, tags, etc in the browser with one action.
+`gitb` command helps to use Backlog's git comfortably. For example, can open PR, issue, branches, tags, etc in the browser with one action. 
 
-Suffix B has multiple meanings. Backlog, Browser, B-Dash (
-Like a Move Super Mario quickly).
+Also, `gitb` wraps all `git` commands, therefore can execute `git-command` using `gitb` like a `gitb fetch`, `gitb pull`,  `gitb push`, and more...
+
+Suffix B has multiple meanings. Backlog, Browser, B-Dash.
 
 ## Installation
 
@@ -73,35 +74,39 @@ __OPTIONS:__
 
 &emsp;Filter issues by STATE. Values: "all", "open", "in_progress", "resolved", "closed", "not_closed" (default).
 
-### Other Commands
+### Browse
 
-`gitb branch`
+Open other git page (e.g. branch, tree, tag, and more...) in current repository.
+
+__COMMANDS:__
+
+`gitb browse branch`
 
 &emsp;Open the branch list page in the current repository.
 
-`gitb tag`
+`gitb browse tag`
 
 &emsp;Open the tag list page in the current repository.
 
-`gitb tree`
+`gitb browse tree`
 
 &emsp;Open the tree page in the current branch.
 
-`gitb history`
+`gitb browse history`
 
 &emsp;Open the history page in the current branch.
 
-`gitb network`
+`gitb browse network`
 
 &emsp;Open the network page in the current branch.
 
-`gitb repo`
+`gitb browse repo`
 
 &emsp;Open the repository list page in the current project.
 
-`gitb help, h`
+## Acknowledgments
 
-&emsp;Shows a list of commands or help for one command.
+Inspired by [github.com/github/hub](https://github.com/github/hub)
 
 ## Bugs and Feedback
 
