@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.0](https://github.com/vvatanabe/gitb/compare/1.0.0...2.0.0) (2019-06-15)
+
+* support all git commands [#10](https://github.com/vvatanabe/gitb/pull/10) ([vvatanabe](https://github.com/vvatanabe))
+
 ## [1.0.0](https://github.com/vvatanabe/gitb/compare/0.9.2...1.0.0) (2019-06-03)
 
 * support Travis CI [#8](https://github.com/vvatanabe/gitb/pull/8) ([vvatanabe](https://github.com/vvatanabe))
