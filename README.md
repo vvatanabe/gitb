@@ -104,6 +104,30 @@ __COMMANDS:__
 
 &emsp;Open the repository list page in the current project.
 
+## Alias 
+
+Please write an alias to .XXXrc (.bashrc, .zshrc, config.fish) if you want to use `gitb <command>` as `git <command>`.
+
+### Bash
+
+```
+eval "$(gitb alias -s)"
+```
+
+### Zsh
+
+```
+function git(){gitb "$@"}
+```
+
+### Fish
+
+```
+function git
+  gitb $argv
+end
+```
+
 ## Acknowledgments
 
 Inspired by [github.com/github/hub](https://github.com/github/hub)

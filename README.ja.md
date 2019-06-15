@@ -104,6 +104,30 @@ __COMMANDS:__
 
 &emsp;現在のプロジェクトのリポジトリ一覧ページを開きます。
 
+## エイリアス
+
+`gitb <command>`を`git <command>`として使いたい場合は、.XXXrc（.bashrc、.zshrc、config.fish）に以下のエイリアスを書いてください。
+
+### Bash
+
+```
+eval "$(gitb alias -s)"
+```
+
+### Zsh
+
+```
+function git(){gitb "$@"}
+```
+
+### Fish
+
+```
+function git
+  gitb $argv
+end
+```
+
 ## 謝辞
 
 Inspired by [github.com/github/hub](https://github.com/github/hub)
