@@ -9,6 +9,17 @@ import (
 	"syscall"
 )
 
+func NewGitCmd(cmd string, args []string) *Command {
+	gitCmd := &Command{
+		Name:   "git",
+		Args:   append([]string{cmd}, args...),
+		Stdin:  os.Stdin,
+		Stdout: os.Stdout,
+		Stderr: os.Stderr,
+	}
+	return gitCmd
+}
+
 type Command struct {
 	Name   string
 	Args   []string
