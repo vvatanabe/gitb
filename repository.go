@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"os"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -132,17 +131,6 @@ type BacklogRepository struct {
 	spaceKey    string
 	projectKey  string
 	repoName    string
-}
-
-func (b *BacklogRepository) Run(gitCmd string, args []string) error {
-	cmd := Command{
-		Name:   "git",
-		Args:   append([]string{gitCmd}, args...),
-		Stdin:  os.Stdin,
-		Stdout: os.Stdout,
-		Stderr: os.Stderr,
-	}
-	return cmd.Run()
 }
 
 func (b *BacklogRepository) OpenRepositoryList() error {

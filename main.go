@@ -34,14 +34,6 @@ func main() {
 	app.UsageText = usageText
 	app.CustomAppHelpTemplate = help()
 	app.Version = FmtVersion()
-	app.Before = func(c *cli.Context) error {
-		repo, err := OpenRepository(".")
-		if err != nil {
-			return exit(err)
-		}
-		setBacklogRepositoryToContext(c, NewBacklogRepository(repo))
-		return nil
-	}
 	app.Commands = []cli.Command{
 		{
 			Name:  "pr",
@@ -54,14 +46,22 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				s := c.String("state")
-				return exit(getBacklogRepositoryFromContext(c).OpenPullRequestList(s))
+				repo, err := open(".")
+				if err != nil {
+					return exit(err)
+				}
+				return exit(repo.OpenPullRequestList(s))
 			},
 			Subcommands: []cli.Command{
 				{
 					Name:  "show",
 					Usage: "Open the pull request page related to current branch",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenPullRequest())
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenPullRequest())
 					},
 				},
 				{
@@ -74,7 +74,11 @@ func main() {
 					},
 					Action: func(c *cli.Context) error {
 						base := c.String("base")
-						return exit(getBacklogRepositoryFromContext(c).OpenAddPullRequest(base, ""))
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenAddPullRequest(base, ""))
 					},
 				},
 			},
@@ -90,21 +94,33 @@ func main() {
 			},
 			Action: func(c *cli.Context) error {
 				s := c.String("state")
-				return exit(getBacklogRepositoryFromContext(c).OpenIssueList(s))
+				repo, err := open(".")
+				if err != nil {
+					return exit(err)
+				}
+				return exit(repo.OpenIssueList(s))
 			},
 			Subcommands: []cli.Command{
 				{
 					Name:  "show",
 					Usage: "Open the issue page related to current branch",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenIssue())
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenIssue())
 					},
 				},
 				{
 					Name:  "add",
 					Usage: "Open the page to add issue in current repository's project",
 					Action: func(c *cli.Context) error {
-						return getBacklogRepositoryFromContext(c).OpenAddIssue()
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenAddIssue())
 					},
 				},
 			},
@@ -117,64 +133,66 @@ func main() {
 					Name:  "branch",
 					Usage: "Open the branch list page in current repository",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenBranchList())
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenBranchList())
 					},
 				},
 				{
 					Name:  "tree",
 					Usage: "Open the tree page in current branch",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenTree(""))
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenTree(""))
 					},
 				},
 				{
 					Name:  "history",
 					Usage: "Open the history page in current branch",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenHistory(""))
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenHistory(""))
 					},
 				},
 				{
 					Name:  "network",
 					Usage: "Open the network page in current branch",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenNetwork(""))
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenNetwork(""))
 					},
 				},
 				{
 					Name:  "repo",
 					Usage: "Open the repository list page in current project",
 					Action: func(c *cli.Context) error {
-						return exit(getBacklogRepositoryFromContext(c).OpenRepositoryList())
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenRepositoryList())
 					},
 				},
 			},
 		},
 	}
 	app.CommandNotFound = func(c *cli.Context, name string) {
-		if err := getBacklogRepositoryFromContext(c).Run(name, os.Args[2:]); err != nil {
+		if err := NewGitCmd(name, os.Args[2:]).Run(); err != nil {
 			log.Fatalln(err)
 		}
 	}
 	app.Run(os.Args)
-}
-
-const contextKeyBacklogRepository = "ctx-key-backlog-repository"
-
-func getBacklogRepositoryFromContext(c *cli.Context) *BacklogRepository {
-	v, ok := c.App.Metadata[contextKeyBacklogRepository]
-	if !ok {
-		return nil
-	}
-	if repo, ok := v.(*BacklogRepository); !ok {
-		return nil
-	} else {
-		return repo
-	}
-}
-
-func setBacklogRepositoryToContext(c *cli.Context, b *BacklogRepository) {
-	c.App.Metadata[contextKeyBacklogRepository] = b
 }
 
 func exit(err error) error {
@@ -182,4 +200,12 @@ func exit(err error) error {
 		return cli.NewExitError(err, 1)
 	}
 	return nil
+}
+
+func open(path string) (*BacklogRepository, error) {
+	repo, err := OpenRepository(path)
+	if err != nil {
+		return nil, err
+	}
+	return NewBacklogRepository(repo), nil
 }
