@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.0.1](https://github.com/vvatanabe/gitb/compare/2.0.0...2.0.1) (2019-06-18)
+
+* git clone can not be done because the repository does not exist (#12) [#13](https://github.com/vvatanabe/gitb/pull/13) ([vvatanabe](https://github.com/vvatanabe))
+
 ## [2.0.0](https://github.com/vvatanabe/gitb/compare/1.0.0...2.0.0) (2019-06-15)
 
 * support all git commands [#10](https://github.com/vvatanabe/gitb/pull/10) ([vvatanabe](https://github.com/vvatanabe))
