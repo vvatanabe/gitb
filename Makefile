@@ -10,50 +10,45 @@ ifeq ($(update),yes)
   u=-u
 endif
 
+export GO111MODULE=on
+
 .PHONY: devel-deps
 devel-deps:
-	export GO111MODULE=off && \
-	go get ${u} github.com/mattn/goveralls && \
-	go get ${u} golang.org/x/lint/golint && \
-	go get ${u} github.com/motemen/gobump/cmd/gobump && \
-	go get ${u} github.com/Songmu/ghch/cmd/ghch && \
-	go get ${u} github.com/Songmu/goxz/cmd/goxz && \
-	go get ${u} github.com/tcnksm/ghr
+	GO111MODULE=off go get ${u}            \
+	  github.com/mattn/goveralls           \
+	  golang.org/x/lint/golint             \
+	  github.com/motemen/gobump/cmd/gobump \
+	  github.com/Songmu/ghch/cmd/ghch      \
+	  github.com/Songmu/goxz/cmd/goxz      \
+	  github.com/tcnksm/ghr
 
 .PHONY: cover
 cover: devel-deps
-	export GO111MODULE=on && \
 	goveralls -coverprofile=coverage.out -service=travis-ci
 
 .PHONY: lint
 lint: devel-deps
-	export GO111MODULE=on && \
 	go vet ./... && \
 	golint -set_exit_status ./...
 
 .PHONY: test
 test:
-	export GO111MODULE=on && \
 	go test -v -race -covermode=atomic -coverprofile=coverage.out ./...
 
 .PHONY: bump
 bump: devel-deps
-	export GO111MODULE=on && \
 	./bump
 
 .PHONY: build
 build:
-	export GO111MODULE=on && \
-	go build -ldflags="$(BUILD_LDFLAGS)" -o ./dist/current/$(NAME) .
+	CGO_ENABLED=0 go build -ldflags="$(BUILD_LDFLAGS)" -o ./dist/current/$(NAME) .
 
 .PHONY: install
 install:
-	export GO111MODULE=on && \
-	go install -ldflags="$(BUILD_LDFLAGS)" .
+	CGO_ENABLED=0 go install -ldflags="$(BUILD_LDFLAGS)" .
 
 .PHONY: crossbuild
 crossbuild: devel-deps
-	export GO111MODULE=on && \
 	goxz -pv=$(VERSION) -arch=386,amd64 -build-ldflags="$(RELEASE_BUILD_LDFLAGS)" \
 	  -o=$(NAME) -d=./dist/$(VERSION) .
 
