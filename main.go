@@ -55,11 +55,14 @@ func main() {
 			Subcommands: []cli.Command{
 				{
 					Name:  "show",
-					Usage: "Open the pull request page related to current branch",
+					Usage: "Open the pull request page. When no specify <PR-ID>, open the PR page related to the current branch",
 					Action: func(c *cli.Context) error {
 						repo, err := open(".")
 						if err != nil {
 							return exit(err)
+						}
+						if c.Args().Present() {
+							return exit(repo.OpenPullRequestByID(c.Args().First()))
 						}
 						return exit(repo.OpenPullRequest())
 					},
