@@ -226,15 +226,19 @@ func PRStatusFromString(s string) (status PRStatus, err error) {
 	return
 }
 
+func (b *BacklogRepository) OpenPullRequestByID(id string) error {
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+		SetProjectKey(b.projectKey).
+		SetRepoName(b.repoName).
+		PullRequestURL(id))
+}
+
 func (b *BacklogRepository) OpenPullRequest() error {
 	id, err := b.findPullRequestIDFromRemote(b.repo.HeadName())
 	if err != nil {
 		return err
 	}
-	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
-		SetProjectKey(b.projectKey).
-		SetRepoName(b.repoName).
-		PullRequestURL(id))
+	return b.OpenPullRequestByID(id)
 }
 
 const (

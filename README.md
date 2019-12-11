@@ -31,9 +31,9 @@ __COMMANDS:__
 
 &emsp;Open the pull request list page in the current repository.
 
-`gitb pr show`
+`gitb pr show [<PR-ID>]`
 
-&emsp;Open the pull request page related to the current branch.
+&emsp;Open the pull request page. When no specify `<PR-ID>`, open the PR page related to the current branch.
 
 `gitb pr add [-b <BASE>]`
 
