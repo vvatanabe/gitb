@@ -39,9 +39,9 @@ __COMMANDS:__
 
 &emsp;Open the page to create pull request with the current branch.
 
-`gitb pr blame <PATH>`
+`gitb pr blame [git blame command options] <PATH>`
 
-&emsp;Show pull request id with `git blame`.
+&emsp;Show backlog's pull request id with `git blame`.
 
 __OPTIONS:__
 
