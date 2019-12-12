@@ -39,6 +39,9 @@ __COMMANDS:__
 
 &emsp;現在のブランチでプルリクエストを追加するページを開きます。
 
+`gitb pr blame <PATH>`
+
+&emsp;指定した`<PATH>`の変更に関連するプルリクエストIDを行単位で表示します。
 
 __OPTIONS:__
 

@@ -84,6 +84,20 @@ func main() {
 						return exit(repo.OpenAddPullRequest(base, ""))
 					},
 				},
+				{
+					Name:  "blame",
+					Usage: "Show pull request id with git blame",
+					Action: func(c *cli.Context) error {
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						if c.Args().Present() {
+							return exit(repo.BlamePR(c.Args().First()))
+						}
+						return exit(nil)
+					},
+				},
 			},
 		},
 		{
