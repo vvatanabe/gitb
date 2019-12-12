@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
+	"context"
 	"fmt"
 	"os/exec"
 	"regexp"
 	"runtime"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -381,6 +384,56 @@ func (b *BacklogRepository) OpenIssueList(state string) error {
 		SetProjectKey(b.projectKey).
 		SetRepoName(b.repoName).
 		IssueListURL(statusIds))
+}
+
+func (b *BacklogRepository) BlamePR(path string) error {
+	argv := []string{"blame", "--first-parent", path}
+	cmd := exec.CommandContext(context.Background(), "git", argv...)
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	err = cmd.Start()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		_ = cmd.Wait()
+	}()
+	cached := make(map[string]string)
+	scanner := bufio.NewScanner(stdout)
+	reg := regexp.MustCompile(` .*?\) `)
+	for scanner.Scan() {
+		commitAndSrc := reg.Split(scanner.Text(), 2)
+		commit, src := commitAndSrc[0], commitAndSrc[1]
+		if _, ok := cached[commit]; !ok {
+			pr, err := lookup(commit)
+			if err != nil {
+				return err
+			}
+			cached[commit] = pr
+		}
+		fmt.Printf("%-9s %s\n", cached[commit], src)
+	}
+	return err
+}
+
+func lookup(commit string) (string, error) {
+	cmd := exec.CommandContext(context.Background(), "git", "show", "--oneline", commit)
+	out, err := cmd.Output()
+	if err != nil {
+		return commit, err
+	}
+	reg := regexp.MustCompile(`^[a-f0-9]+ Merge pull request #([0-9]+) \S+ into \S+`)
+	matches := reg.FindStringSubmatch(string(out))
+	if len(matches) < 1 {
+		return commit, nil
+	}
+	id, err := strconv.Atoi(matches[1])
+	if err != nil {
+		return commit, nil
+	}
+	return fmt.Sprintf("PR #%d", id), nil
 }
 
 func openBrowser(url string) error {
