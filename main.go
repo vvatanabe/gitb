@@ -85,15 +85,16 @@ func main() {
 					},
 				},
 				{
-					Name:  "blame",
-					Usage: "Show pull request id with git blame",
+					Name:            "blame",
+					Usage:           "Show pull request id with git blame",
+					SkipFlagParsing: true,
 					Action: func(c *cli.Context) error {
 						repo, err := open(".")
 						if err != nil {
 							return exit(err)
 						}
 						if c.Args().Present() {
-							return exit(repo.BlamePR(c.Args().First()))
+							return exit(repo.BlamePR(c.Args()))
 						}
 						return exit(nil)
 					},

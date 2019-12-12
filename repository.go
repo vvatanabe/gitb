@@ -386,8 +386,8 @@ func (b *BacklogRepository) OpenIssueList(state string) error {
 		IssueListURL(statusIds))
 }
 
-func (b *BacklogRepository) BlamePR(path string) error {
-	argv := []string{"blame", "--first-parent", path}
+func (b *BacklogRepository) BlamePR(argv []string) error {
+	argv = append([]string{"blame", "--first-parent"}, argv...)
 	cmd := exec.CommandContext(context.Background(), "git", argv...)
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -402,10 +402,10 @@ func (b *BacklogRepository) BlamePR(path string) error {
 	}()
 	cached := make(map[string]string)
 	scanner := bufio.NewScanner(stdout)
-	reg := regexp.MustCompile(` .*?\) `)
 	for scanner.Scan() {
-		commitAndSrc := reg.Split(scanner.Text(), 2)
+		commitAndSrc := strings.SplitN(scanner.Text(), " ", 2)
 		commit, src := commitAndSrc[0], commitAndSrc[1]
+
 		if _, ok := cached[commit]; !ok {
 			pr, err := lookup(commit)
 			if err != nil {
@@ -413,7 +413,15 @@ func (b *BacklogRepository) BlamePR(path string) error {
 			}
 			cached[commit] = pr
 		}
-		fmt.Printf("%-9s %s\n", cached[commit], src)
+
+		padding := len(commit)
+
+		if size := len(cached[commit]); padding < size {
+			padding = size
+		}
+
+		format := "%-" + strconv.Itoa(padding) + "s %s\n"
+		fmt.Printf(format, cached[commit], src)
 	}
 	return err
 }
