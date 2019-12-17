@@ -205,12 +205,22 @@ func main() {
 			},
 		},
 	}
+	app.OnUsageError = func(context *cli.Context, err error, isSubcommand bool) error {
+		if isSubcommand {
+			return err
+		}
+		if err := NewGitCmd(os.Args[1:]).Run(); err != nil {
+			return err
+		}
+		return nil
+	}
 	app.CommandNotFound = func(c *cli.Context, name string) {
-		if err := NewGitCmd(name, os.Args[2:]).Run(); err != nil {
+		args := append([]string{name}, os.Args[2:]...)
+		if err := NewGitCmd(args).Run(); err != nil {
 			log.Fatalln(err)
 		}
 	}
-	app.Run(os.Args)
+	_ = app.Run(os.Args)
 }
 
 func exit(err error) error {
