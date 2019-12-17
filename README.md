@@ -1,6 +1,6 @@
 # gitb [![Build Status](https://travis-ci.org/vvatanabe/gitb.svg?branch=master)](https://travis-ci.org/vvatanabe/gitb) [![Coverage Status](https://coveralls.io/repos/github/vvatanabe/gitb/badge.svg?branch=master)](https://coveralls.io/github/vvatanabe/gitb?branch=master)
 
-A command line tool for using Backlog's git comfortably.
+A command line tool for using Backlog's git comfortably. https://gitb.vvatanabe.com/
 
 ## Description
 
@@ -12,12 +12,27 @@ Suffix B has multiple meanings. Backlog, Browser, B-Dash.
 
 ## Installation
 
+### Homebrew
+
+It can be installed with Homebrew, the package manager for MacOS.
+
+```
+$ brew tap vvatanabe/gitb
+$ brew install gitb
+```
+
+### Go
+
+If you have the Go(go1.13+) installed, you can also install it with go get command.
+
+```
+$ go get github.com/vvatanabe/gitb
+```
+
+### GitHub Release Page
+
 Built binaries are available on Github releases:  
 https://github.com/vvatanabe/gitb/releases
-
-This package can be installed with the go get command too:
-
-`$ go get github.com/vvatanabe/gitb`
 
 ## Usage
 
@@ -133,7 +148,8 @@ end
 
 ## Acknowledgments
 
-Inspired by [github.com/github/hub](https://github.com/github/hub)
+- Inspired by [github.com/github/hub](https://github.com/github/hub)
+- `gitb pr blame` is a Golang port of [kazuho/git-blame-pr.pl](https://gist.github.com/kazuho/eab551e5527cb465847d6b0796d64a39)
 
 ## Bugs and Feedback
 

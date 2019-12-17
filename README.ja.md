@@ -12,12 +12,27 @@ Backlogのgitを快適に使うためのコマンドラインツール。
 
 ## インストール
 
+### Homebrew
+
+MacOSで使用可能なパッケージマネージャであるHomebrewでインストールできます。
+
+```
+$ brew tap vvatanabe/gitb
+$ brew install gitb
+```
+
+### Go
+
+Go言語(go1.13+)をインストールしていれば、go getコマンドでもインストールできます。
+
+```
+$ go get github.com/vvatanabe/gitb
+```
+
+### GitHub Release Page
+
 ビルドされたバイナリはGithubのリリースで利用可能です:  
 https://github.com/vvatanabe/gitb/releases
-
-このパッケージはgo getコマンドでもインストールできます:
-
-`$ go get github.com/vvatanabe/gitb`
 
 ## 使い方
 
@@ -133,7 +148,9 @@ end
 
 ## 謝辞
 
-Inspired by [github.com/github/hub](https://github.com/github/hub)
+- Inspired by [github.com/github/hub](https://github.com/github/hub)
+- `gitb pr blame` is a Golang port of [kazuho/git-blame-pr.pl](https://gist.github.com/kazuho/eab551e5527cb465847d6b0796d64a39)
+
 
 ## バグとフィードバック
 
