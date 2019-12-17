@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.2.1](https://github.com/vvatanabe/gitb/compare/2.2.0...2.2.1) (2019-12-18)
+
+* update go version 1.13 in go.mod (#28) [#29](https://github.com/vvatanabe/gitb/pull/29) ([vvatanabe](https://github.com/vvatanabe))
+* support global option for git (#18) [#27](https://github.com/vvatanabe/gitb/pull/27) ([vvatanabe](https://github.com/vvatanabe))
+
 ## [2.2.0](https://github.com/vvatanabe/gitb/compare/2.1.0...2.2.0) (2019-12-12)
 
 * Support origin blame command options (#24) [#25](https://github.com/vvatanabe/gitb/pull/25) ([vvatanabe](https://github.com/vvatanabe))
