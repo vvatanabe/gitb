@@ -126,16 +126,12 @@ __COMMANDS:__
 
 Please write an alias to .XXXrc (.bashrc, .zshrc, config.fish) if you want to use `gitb <command>` as `git <command>`.
 
-### Bash
+### Bash, Zsh
 
 ```
-eval "$(gitb alias -s)"
-```
-
-### Zsh
-
-```
-function git(){gitb "$@"}
+function git(){
+  gitb "$@"
+}
 ```
 
 ### Fish

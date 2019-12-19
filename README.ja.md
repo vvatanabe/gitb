@@ -126,16 +126,12 @@ __COMMANDS:__
 
 `gitb <command>`を`git <command>`として使いたい場合は、.XXXrc（.bashrc、.zshrc、config.fish）に以下のエイリアスを書いてください。
 
-### Bash
+### Bash, Zsh
 
 ```
-eval "$(gitb alias -s)"
-```
-
-### Zsh
-
-```
-function git(){gitb "$@"}
+function git(){
+  gitb "$@"
+}
 ```
 
 ### Fish
