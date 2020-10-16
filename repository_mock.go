@@ -6,6 +6,7 @@ type RepositoryMock struct {
 	HeadShortNameFunc      func() string
 	RemoteEndpointHostFunc func() string
 	RemoteEndpointPathFunc func() string
+	RootDirectoryFunc 	   func() string
 	LsRemoteFunc           func() (RefToHash, error)
 }
 
@@ -35,6 +36,13 @@ func (m *RepositoryMock) RemoteEndpointPath() string {
 		panic("This method is not defined.")
 	}
 	return m.RemoteEndpointPathFunc()
+}
+
+func (m *RepositoryMock) RootDirectory() string {
+	if m.RootDirectoryFunc == nil {
+		panic("This method is not defined.")
+	}
+	return m.RootDirectoryFunc()
 }
 
 func (m *RepositoryMock) LsRemote() (RefToHash, error) {

@@ -2,8 +2,10 @@ package main
 
 import (
 	"log"
+	"net/url"
 	"os"
 	"os/exec"
+	"path"
 	"strings"
 
 	"github.com/urfave/cli"
@@ -200,6 +202,42 @@ func main() {
 							return exit(err)
 						}
 						return exit(repo.OpenRepositoryList())
+					},
+				},
+				{
+					Name:  "show",
+					Usage: "Open the corresponding page to given file or directory in current project",
+					Flags: []cli.Flag{
+						cli.StringFlag{
+							Name: "l, line",
+						},
+					},
+					Action: func(c *cli.Context) error {
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						filePath := c.Args().First()
+						if !path.IsAbs(filePath) {
+							wd, err := os.Getwd()
+							if err != nil {
+								return exit(err)
+							}
+							filePath = path.Join(wd, filePath)
+						}
+						fileUrl, err := url.Parse(filePath)
+						if err != nil {
+							return exit(err)
+						}
+						fs, err := os.Stat(fileUrl.Path)
+						if err != nil {
+							return exit(err)
+						}
+						line := c.String("line")
+						if line == "" {
+							line = fileUrl.Fragment
+						}
+						return exit(repo.OpenObject(fileUrl.Path, fs.IsDir(), line))
 					},
 				},
 			},
