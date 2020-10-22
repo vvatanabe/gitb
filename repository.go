@@ -22,6 +22,7 @@ type Repository interface {
 	HeadShortName() string
 	RemoteEndpointHost() string
 	RemoteEndpointPath() string
+	RootDirectory() string
 	LsRemote() (RefToHash, error)
 }
 
@@ -76,6 +77,14 @@ func (r repository) RemoteEndpointHost() string {
 
 func (r repository) RemoteEndpointPath() string {
 	return r.ep.Path
+}
+
+func (r repository) RootDirectory() string {
+	wt, err := r.repo.Worktree()
+	if err != nil {
+		panic(err)
+	}
+	return wt.Filesystem.Root()
 }
 
 func (r repository) LsRemote() (RefToHash, error) {
@@ -134,6 +143,29 @@ type BacklogRepository struct {
 	spaceKey    string
 	projectKey  string
 	repoName    string
+}
+
+func (b *BacklogRepository) OpenObject(absPath string, isDirectory bool, line string) error {
+	root := b.repo.RootDirectory()
+	if !strings.HasPrefix(absPath, root) {
+		return errors.New("path " + absPath + " is out of repository " + root)
+	}
+
+	if line != "" {
+		if isDirectory {
+			return errors.New("line cannot be set for directory.")
+		} else {
+			re := regexp.MustCompile("^\\d+(-\\d+)?$")
+			if !re.MatchString(line) {
+				return errors.New("line can be number or 'from-to' format. :" + line)
+			}
+		}
+	}
+	relPath := strings.TrimPrefix(absPath[len(root):], "/")
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+		SetProjectKey(b.projectKey).
+		SetRepoName(b.repoName).
+		ObjectURL(b.repo.HeadShortName(), relPath, isDirectory, line))
 }
 
 func (b *BacklogRepository) OpenRepositoryList() error {

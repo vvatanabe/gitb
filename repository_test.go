@@ -236,6 +236,82 @@ func TestBacklogRepository_OpenTree(t *testing.T) {
 	}
 }
 
+func TestBacklogRepository_OpenObject(t *testing.T) {
+	type fields struct {
+		openBrowser func(url string) error
+		repo        Repository
+		domain      string
+		spaceKey    string
+		projectKey  string
+		repoName    string
+	}
+	type args struct {
+		refOrHash string
+	}
+	openedUrl := ""
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			fields: fields{
+				func(url string) error {
+					openedUrl = url
+					return nil
+				},
+				&RepositoryMock{
+					HeadShortNameFunc: func() string {
+						return "develop"
+					},
+					RootDirectoryFunc: func() string {
+						return "/path/to/repo"
+					},
+				},
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogRepository{
+				openBrowser: tt.fields.openBrowser,
+				repo:        tt.fields.repo,
+				domain:      tt.fields.domain,
+				spaceKey:    tt.fields.spaceKey,
+				projectKey:  tt.fields.projectKey,
+				repoName:    tt.fields.repoName,
+			}
+			if err := b.OpenObject("/path/to/repo/path/to/dir", true, ""); (err != nil) != tt.wantErr {
+				t.Errorf("BacklogRepository.OpenObject() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			expected := "https://foo.backlog.com/git/BAR/baz/tree/develop/path/to/dir"
+			if openedUrl != expected {
+				t.Errorf("BacklogRepository.OpenObject() error = expected %s but result was %s , wantErr %v", expected, openedUrl, tt.wantErr)
+			}
+			if err := b.OpenObject("/path/to/repo/path/to/file", false, "10-20"); (err != nil) != tt.wantErr {
+				t.Errorf("BacklogRepository.OpenObject() error = %v, wantErr %v", err, tt.wantErr)
+			}
+			expected = "https://foo.backlog.com/git/BAR/baz/blob/develop/path/to/file#10-20"
+			if openedUrl != expected {
+				t.Errorf("BacklogRepository.OpenObject() error = expected %s but result was %s , wantErr %v", expected, openedUrl, tt.wantErr)
+			}
+			if err := b.OpenObject("/path/to/repo/path/to/file", false, "a10-20"); err == nil {
+				t.Errorf("line validation doesn't work properly.")
+			}
+			if err := b.OpenObject("/path/to/repo/path/to/dir", true, "100"); err == nil {
+				t.Errorf("line validation doesn't work properly.")
+			}
+
+		})
+	}
+}
+
 func TestBacklogRepository_OpenHistory(t *testing.T) {
 	type fields struct {
 		openBrowser func(url string) error

@@ -45,6 +45,18 @@ func (b *BacklogURLBuilder) GitRepoBaseURL() string {
 	return b.GitBaseURL() + path.Join("/", b.repoName)
 }
 
+func (b *BacklogURLBuilder) ObjectURL(refOrHash string, relPath string, isDirectory bool, line string) string {
+	base := "blob"
+	if isDirectory {
+		base = "tree"
+	}
+	hash := ""
+	if line != "" {
+		hash = "#" + line
+	}
+	return b.GitRepoBaseURL() + path.Join("/", base, refOrHash, relPath) + hash
+}
+
 func (b *BacklogURLBuilder) TreeURL(refOrHash string) string {
 	return b.GitRepoBaseURL() + path.Join("/", "tree", refOrHash)
 }
