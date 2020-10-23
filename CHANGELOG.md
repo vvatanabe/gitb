@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.3.0](https://github.com/vvatanabe/gitb/compare/2.2.1...2.3.0) (2020-10-23)
+
+* new command "browse show" [#32](https://github.com/vvatanabe/gitb/pull/32) ([tockri](https://github.com/tockri))
+
 ## [2.2.1](https://github.com/vvatanabe/gitb/compare/2.2.0...2.2.1) (2019-12-18)
 
 * update go version 1.13 in go.mod (#28) [#29](https://github.com/vvatanabe/gitb/pull/29) ([vvatanabe](https://github.com/vvatanabe))
