@@ -5,22 +5,22 @@ COMMIT = $$(git describe --tags --always)
 DATE = $$(date '+%Y-%m-%d_%H:%M:%S')
 BUILD_LDFLAGS = -X main.commit=$(COMMIT) -X main.date=$(DATE)
 RELEASE_BUILD_LDFLAGS = -s -w $(BUILD_LDFLAGS)
-
-ifeq ($(update),yes)
-  u=-u
-endif
+u := $(if $(update),-u)
 
 export GO111MODULE=on
 
 .PHONY: devel-deps
 devel-deps:
-	GO111MODULE=off go get ${u}            \
+	sh -c '\
+	tmpdir=$$(mktemp -d); \
+	cd $$tmpdir; \
+	go get ${u} \
 	  github.com/mattn/goveralls           \
 	  golang.org/x/lint/golint             \
-	  github.com/motemen/gobump/cmd/gobump \
+	  github.com/x-motemen/gobump/cmd/gobump \
 	  github.com/Songmu/ghch/cmd/ghch      \
 	  github.com/Songmu/goxz/cmd/goxz      \
-	  github.com/tcnksm/ghr
+	  github.com/tcnksm/ghr'
 
 .PHONY: cover
 cover: devel-deps
