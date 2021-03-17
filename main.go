@@ -161,6 +161,17 @@ func main() {
 					},
 				},
 				{
+					Name:  "tag",
+					Usage: "Open the tag list page in the current repository.",
+					Action: func(c *cli.Context) error {
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						return exit(repo.OpenTagList())
+					},
+				},
+				{
 					Name:  "tree",
 					Usage: "Open the tree page in current branch",
 					Action: func(c *cli.Context) error {
