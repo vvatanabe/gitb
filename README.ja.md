@@ -122,6 +122,10 @@ __COMMANDS:__
 
 &emsp;現在のプロジェクトのリポジトリ一覧ページを開きます。
 
+`gitb browse show`
+
+&emsp;与えられたファイルまたはディレクトリの該当するページを開きます。
+
 ## エイリアス
 
 `gitb <command>`を`git <command>`として使いたい場合は、.XXXrc（.bashrc、.zshrc、config.fish）に以下のエイリアスを書いてください。

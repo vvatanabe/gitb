@@ -122,6 +122,10 @@ __COMMANDS:__
 
 &emsp;Open the repository list page in the current project.
 
+`gitb browse show`
+
+&emsp;Open the corresponding page to given file or directory in current project.
+
 ## Alias 
 
 Please write an alias to .XXXrc (.bashrc, .zshrc, config.fish) if you want to use `gitb <command>` as `git <command>`.
