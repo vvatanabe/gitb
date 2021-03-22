@@ -1,5 +1,10 @@
 # Changelog
 
+## [2.3.1](https://github.com/vvatanabe/gitb/compare/2.3.0...2.3.1) (2021-03-22)
+
+* Add missing browse tag command [#35](https://github.com/vvatanabe/gitb/pull/35) ([mmktomato](https://github.com/mmktomato))
+* Add explanation of browse show to README [#34](https://github.com/vvatanabe/gitb/pull/34) ([mmktomato](https://github.com/mmktomato))
+
 ## [2.3.0](https://github.com/vvatanabe/gitb/compare/2.2.1...2.3.0) (2020-10-23)
 
 * new command "browse show" [#32](https://github.com/vvatanabe/gitb/pull/32) ([tockri](https://github.com/tockri))
