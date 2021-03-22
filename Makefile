@@ -50,7 +50,7 @@ install:
 .PHONY: crossbuild
 crossbuild: devel-deps
 	goxz -pv=$(VERSION) -arch=386,amd64 -build-ldflags="$(RELEASE_BUILD_LDFLAGS)" \
-	  -o=$(NAME) -d=./dist/$(VERSION) .
+	  -d=./dist/$(VERSION) .
 
 .PHONY: upload
 upload: devel-deps
