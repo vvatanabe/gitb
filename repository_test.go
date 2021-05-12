@@ -1288,3 +1288,53 @@ func TestBacklogRepository_OpenIssueList(t *testing.T) {
 		})
 	}
 }
+
+func TestBacklogRepository_OpenCommit(t *testing.T) {
+	type fields struct {
+		openBrowser func(url string) error
+		repo        Repository
+		domain      string
+		spaceKey    string
+		projectKey  string
+		repoName    string
+		hash        string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		wantErr bool
+	}{
+		{
+			fields: fields{
+				openBrowser: func(url string) error {
+					want := "https://foo.backlog.com/git/BAR/baz/commit/qux"
+					if url != want {
+						return errors.New(fmt.Sprintf("result %v, want %v", url, want))
+					}
+					return nil
+				},
+				domain:     "backlog.com",
+				spaceKey:   "foo",
+				projectKey: "BAR",
+				repoName:   "baz",
+				hash:       "qux",
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogRepository{
+				openBrowser: tt.fields.openBrowser,
+				repo:        tt.fields.repo,
+				domain:      tt.fields.domain,
+				spaceKey:    tt.fields.spaceKey,
+				projectKey:  tt.fields.projectKey,
+				repoName:    tt.fields.repoName,
+			}
+			if err := b.OpenCommit(tt.fields.hash); (err != nil) != tt.wantErr {
+				t.Errorf("BacklogRepository.OpenCommit() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

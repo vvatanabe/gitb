@@ -251,6 +251,21 @@ func main() {
 						return exit(repo.OpenObject(fileUrl.Path, fs.IsDir(), line))
 					},
 				},
+				{
+					Name:  "commit",
+					Usage: "Open the network page in current branch",
+					Action: func(c *cli.Context) error {
+						repo, err := open(".")
+						if err != nil {
+							return exit(err)
+						}
+						hash := c.Args().First()
+						if len(hash) == 0 {
+							return exit(err)
+						}
+						return exit(repo.OpenCommit(hash))
+					},
+				},
 			},
 		},
 	}

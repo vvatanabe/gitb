@@ -126,6 +126,10 @@ __COMMANDS:__
 
 &emsp;Open the corresponding page to given file or directory in current project.
 
+`gitb browse commit <hash>`
+
+&emsp;Open the commit page to given hash in current project.
+
 ## Alias 
 
 Please write an alias to .XXXrc (.bashrc, .zshrc, config.fish) if you want to use `gitb <command>` as `git <command>`.
