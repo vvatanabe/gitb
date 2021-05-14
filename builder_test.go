@@ -710,3 +710,42 @@ func TestBacklogURLBuilder_IssueListURL(t *testing.T) {
 		})
 	}
 }
+
+func TestBacklogURLBuilder_CommitURL(t *testing.T) {
+	type fields struct {
+		domain     string
+		spaceKey   string
+		projectKey string
+		repoName   string
+		hash       string
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			fields: fields{
+				"backlog.com",
+				"foo",
+				"BAR",
+				"baz",
+				"qux",
+			},
+			want: "https://foo.backlog.com/git/BAR/baz/commit/qux",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			b := &BacklogURLBuilder{
+				domain:     tt.fields.domain,
+				spaceKey:   tt.fields.spaceKey,
+				projectKey: tt.fields.projectKey,
+				repoName:   tt.fields.repoName,
+			}
+			if got := b.CommitURL(tt.fields.hash); got != tt.want {
+				t.Errorf("BacklogURLBuilder.CommitURL() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

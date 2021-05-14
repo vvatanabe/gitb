@@ -77,6 +77,10 @@ func (b *BacklogURLBuilder) TagListURL() string {
 	return b.GitRepoBaseURL() + path.Join("/", "tags")
 }
 
+func (b *BacklogURLBuilder) CommitURL(hash string) string {
+	return b.GitRepoBaseURL() + path.Join("/", "commit", hash)
+}
+
 func (b *BacklogURLBuilder) PullRequestListURL(statusID int) string {
 	var q string
 	if statusID > 0 {

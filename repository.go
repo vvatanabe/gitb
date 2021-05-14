@@ -195,6 +195,13 @@ func (b *BacklogRepository) OpenHistory(refOrHash string) error {
 		HistoryURL(refOrHash))
 }
 
+func (b *BacklogRepository) OpenCommit(hash string) error {
+	return b.openBrowser(NewBacklogURLBuilder(b.domain, b.spaceKey).
+		SetProjectKey(b.projectKey).
+		SetRepoName(b.repoName).
+		CommitURL(hash))
+}
+
 func (b *BacklogRepository) OpenNetwork(refOrHash string) error {
 	if refOrHash == "" {
 		refOrHash = b.repo.HeadShortName()
