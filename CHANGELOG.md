@@ -1,5 +1,9 @@
 # Changelog
 
+## [2.4.0](https://github.com/vvatanabe/gitb/compare/2.3.1...2.4.0) (2021-05-14)
+
+* browse commit <hash> [#39](https://github.com/vvatanabe/gitb/pull/39) ([iwag](https://github.com/iwag))
+
 ## [2.3.1](https://github.com/vvatanabe/gitb/compare/2.3.0...2.3.1) (2021-03-22)
 
 * Add missing browse tag command [#35](https://github.com/vvatanabe/gitb/pull/35) ([mmktomato](https://github.com/mmktomato))
