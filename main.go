@@ -20,10 +20,11 @@ func help() string {
 	sb.Write(out)
 	sb.WriteString(`
 These Backlog's git commands are provided by gitb:
-     pr       Open the pull request list page in current repository
-     issue    Open the issue list page in current project
-     browse   Open other git page (e.g. branch, tree, tag, and more...) in current repository
-     help, h  Shows a list of commands or help for one command
+     pr          Open the pull request list page in current repository
+     issue       Open the issue list page in current project
+     browse      Open other git page (e.g. branch, tree, tag, and more...) in current repository
+     new-branch  create branch with issue
+     help, h     Shows a list of commands or help for one command
 
 `)
 	return sb.String()
@@ -268,7 +269,33 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:  "new-branch",
+			Usage: "create branch by issue key or issue id",
+			Flags: []cli.Flag{
+				cli.StringFlag{
+					Name:  "sep",
+					Value: "-",
+				},
+				cli.StringFlag{
+					Name:  "apikey",
+					EnvVar: "BACKLOG_API_KEY",
+					Required: true,
+				},
+			},
+			Action: func(c *cli.Context) error {
+				apikey := c.String("apikey")
+				sep := c.String("sep")
+				repo, err := open(".")
+				if err != nil {
+					return exit(err)
+				}
+				issueIDOrKey := c.Args().First()
+				return exit(repo.CreateBranchByIssueKey(issueIDOrKey, sep, apikey))
+			},
+		},
 	}
+
 	app.OnUsageError = func(context *cli.Context, err error, isSubcommand bool) error {
 		if isSubcommand {
 			return err

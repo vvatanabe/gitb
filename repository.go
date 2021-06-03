@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"context"
 	"fmt"
+	v2 "github.com/vvatanabe/go-backlog/backlog/v2"
 	"os/exec"
 	"regexp"
 	"runtime"
@@ -425,6 +426,25 @@ func (b *BacklogRepository) OpenIssueList(state string) error {
 		IssueListURL(statusIds))
 }
 
+func (b *BacklogRepository) CreateBranchByIssueKey(issueIDOrKey, sep, apiKey string) error {
+	spaceDomain := fmt.Sprintf("%s.%s", b.spaceKey, b.domain)
+	api := v2.NewClient(spaceDomain, nil)
+	api.SetAPIKey(apiKey)
+	issue, _, err := api.Issues.GetIssue(context.Background(), issueIDOrKey)
+	if err != nil {
+		return err
+	}
+	name := fmt.Sprintf("%s/%s", issue.IssueKey, issue.Summary)
+	name = strings.TrimSpace(name)
+	name = strings.Replace(name, " ", sep, -1)
+	cmd := exec.CommandContext(context.Background(), "git", "checkout", "-b", name)
+	_, err = cmd.Output()
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
 func (b *BacklogRepository) BlamePR(argv []string) error {
 	argv = append([]string{"blame", "--first-parent"}, argv...)
 	cmd := exec.CommandContext(context.Background(), "git", argv...)
@@ -497,3 +517,4 @@ func openBrowser(url string) error {
 	}
 	return err
 }
+
